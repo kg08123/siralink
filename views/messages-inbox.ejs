@@ -1,11 +1,16 @@
 <h1 class="page-title"><%= t('messages') %></h1>
 <% if (!convs.length) { %><div class="empty"><%= t('noConversations') %></div><% } %>
 <% convs.forEach(function(c){ %>
-  <a class="chat-item" href="/messages/<%= c.id %>">
-    <div class="grow">
+  <div class="chat-item">
+    <a class="grow" href="/messages/<%= c.id %>" style="text-decoration:none;color:inherit">
       <div class="ci-top"><b><%= c.other_name %></b><% if (c.unread) { %><span class="badge"><%= c.unread %></span><% } %></div>
       <div class="sub"><%= c.job_title %></div>
-      <div class="ci-prev"><%= c.lastBody %></div>
-    </div>
-  </a>
+      <div class="ci-prev"><% if (c.lastBody) { %><%= c.lastBody %><% } else if (c.hasImage) { %><%- icon('image') %><% } %></div>
+    </a>
+    <% if (c.other_role === 'freelancer') { %>
+      <a class="icon-btn" style="width:40px;height:40px;flex:0 0 auto" href="/freelancers/<%= c.other_id %>" aria-label="<%= t('viewProfile') %>"><%- icon('users') %></a>
+    <% } else if (c.other_company_id) { %>
+      <a class="icon-btn" style="width:40px;height:40px;flex:0 0 auto" href="/companies/<%= c.other_company_id %>" aria-label="<%= t('viewProfile') %>"><%- icon('users') %></a>
+    <% } %>
+  </div>
 <% }) %>

@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const { requireRole } = require('../middleware/auth');
+const { notify } = require('../lib/notify');
 const upload = require('../lib/upload');
 const router = express.Router();
 
@@ -66,6 +67,20 @@ router.post('/apply/:jobId', upload.array('documents', 10), async (req, res, nex
       await db.query('INSERT INTO application_docs(application_id, doc_name, file_path) VALUES($1,$2,$3)',
         [appId, docs[i], file ? '/uploads/' + file.filename : null]);
     }
+    // Notify the company
+    try {
+      const ju = await db.query(
+        `SELECT u.id AS company_user_id, j.title AS job_title, fu.name AS freelancer_name
+         FROM jobs j JOIN companies c ON c.id = j.company_id
+         JOIN users u ON u.id = c.user_id
+         JOIN users fu ON fu.id = $2
+         WHERE j.id = $1`, [req.params.jobId, req.user.id]);
+      if (ju.rows.length) {
+        await notify(db, ju.rows[0].company_user_id, 'application',
+          '/c/jobs/' + req.params.jobId + '/applicants',
+          'notifNewAppT', 'notifNewAppB', [ju.rows[0].freelancer_name, ju.rows[0].job_title]);
+      }
+    } catch (ne) { console.error('notify on apply failed:', ne.message); }
     req.session.flash = { type: 'ok', msg: t('applicationSent') };
     res.redirect('/f/applications');
   } catch (e) { next(e); }

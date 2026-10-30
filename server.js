@@ -4,8 +4,10 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const db = require('./db');
-const { t, CATEGORIES, CITIES, catName, cityName } = require('./i18n');
+const { t, nt, CATEGORIES, CITIES, catName, cityName } = require('./i18n');
 const { icon } = require('./lib/icons');
+const { notify } = require('./lib/notify');
+const { googleEnabled, passport } = require('./lib/google');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -49,6 +51,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+if (googleEnabled && passport) app.use(passport.initialize());
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'siralink-dev-secret-change-me',
   resave: false,
@@ -66,6 +70,8 @@ app.use((req, res, next) => {
   }
   res.locals.lang = req.lang;
   res.locals.t = (key) => t(req.lang, key);
+  res.locals.nt = (stored) => nt(req.lang, stored);
+  res.locals.googleEnabled = googleEnabled;
   res.locals.stars = (n) => {
     const f = Math.max(0, Math.min(5, Math.round(Number(n) || 0)));
     return '★'.repeat(f) + '☆'.repeat(5 - f);
@@ -107,6 +113,7 @@ app.use(async (req, res, next) => {
   res.locals.company = req.company;
   // Unread message count for the header badge
   res.locals.unreadCount = 0;
+  res.locals.notifCount = 0;
   if (req.user) {
     try {
       const u = await db.query(
@@ -117,6 +124,41 @@ app.use(async (req, res, next) => {
         [req.user.id]);
       res.locals.unreadCount = u.rows[0].n;
     } catch (e) { /* tables may not exist on first boot */ }
+    try {
+      const n = await db.query(
+        'SELECT COUNT(*)::int AS n FROM notifications WHERE user_id=$1 AND is_read=FALSE',
+        [req.user.id]);
+      res.locals.notifCount = n.rows[0].n;
+    } catch (e) { /* table may not exist on first boot */ }
+  }
+  next();
+});
+
+// Lazy 24h reminder sweep: pending applications older than 24h nudge the company.
+// Throttled to at most once every 10 minutes (in-memory).
+let lastReminderRun = 0;
+app.use(async (req, res, next) => {
+  const now = Date.now();
+  if (now - lastReminderRun > 10 * 60 * 1000) {
+    lastReminderRun = now;
+    try {
+      const r = await db.query(
+        `SELECT a.id, u.name AS freelancer_name, j.title AS job_title, j.id AS job_id, cu.id AS company_user_id
+         FROM applications a
+         JOIN jobs j ON j.id = a.job_id
+         JOIN companies c ON c.id = j.company_id
+         JOIN users cu ON cu.id = c.user_id
+         JOIN users u ON u.id = a.freelancer_user_id
+         WHERE a.status = 'pending' AND a.reminder_sent_at IS NULL
+           AND a.created_at < NOW() - INTERVAL '24 hours'
+         LIMIT 50`);
+      for (const row of r.rows) {
+        await notify(db, row.company_user_id, 'reminder', '/c/jobs/' + row.job_id + '/applicants',
+          'notifReminderT', 'notifReminderB', [row.freelancer_name, row.job_title]);
+        await db.query('UPDATE applications SET reminder_sent_at = NOW() WHERE id = $1', [row.id]);
+      }
+      if (r.rows.length) console.log('reminder sweep: notified', r.rows.length, 'pending applications');
+    } catch (e) { console.error('reminder sweep failed:', e.message); }
   }
   next();
 });

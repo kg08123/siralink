@@ -182,3 +182,19 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .bubble.theirs{align-self:flex-start;border-bottom-left-radius:4px}
 .chatbar{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 0 calc(10px + env(safe-area-inset-bottom));background:var(--bg)}
 .chatbar input{flex:1;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1rem;background:#fff}
+
+/* Batch 3 additions */
+.avatar-lg{width:72px;height:72px;border-radius:20px;object-fit:cover;flex:0 0 auto}
+.avatar-ph{background:var(--green-soft);color:var(--green);display:flex;align-items:center;justify-content:center}
+.avatar-ph .ico{width:34px;height:34px}
+.avatar-sm{width:40px;height:40px;border-radius:12px;object-fit:cover}
+.detail-head{display:flex;gap:14px;align-items:center;margin:14px 0}
+.btn-google{background:#fff;border:1.5px solid var(--line);color:var(--ink);padding:13px 16px;font-size:1rem;width:100%;display:flex;align-items:center;justify-content:center;gap:10px}
+.g-logo{font-weight:900;font-size:1.25rem;color:#4285F4;font-family:system-ui}
+.or-row{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:.85rem}
+.or-row::before,.or-row::after{content:'';flex:1;height:1px;background:var(--line)}
+.chat-img{max-width:230px;max-height:230px;border-radius:10px;display:block;margin-bottom:6px}
+.img-prev{display:flex;align-items:center;gap:10px;margin:8px 0}
+.img-prev img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.chat-item.unread{border-color:var(--green);background:var(--green-soft)}
+.bubble p{margin:0 0 2px;word-break:break-word}

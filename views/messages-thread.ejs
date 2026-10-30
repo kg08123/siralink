@@ -2,11 +2,21 @@
 <p class="sub"><%= conv.job_title %></p>
 <div class="chat" id="chat">
   <% messages.forEach(function(m){ %>
-    <div class="bubble <%= m.sender_user_id===user.id?'mine':'theirs' %>"><p><%= m.body %></p><small><%= new Date(m.created_at).toLocaleString() %></small></div>
+    <div class="bubble <%= m.sender_user_id===user.id?'mine':'theirs' %>">
+      <% if (m.image_data) { %><a href="<%= m.image_data %>" target="_blank" rel="noopener"><img class="chat-img" src="<%= m.image_data %>" alt=""></a><% } %>
+      <% if (m.body) { %><p><%= m.body %></p><% } %>
+      <small><%= new Date(m.created_at).toLocaleString() %></small>
+    </div>
   <% }) %>
 </div>
-<form id="sendform" method="post" action="/messages/<%= conv.id %>" class="chatbar">
-  <input type="text" name="body" placeholder="<%= t('typeMessage') %>" required autocomplete="off" maxlength="2000">
+<div id="imgPrev" class="img-prev" hidden>
+  <img id="imgPrevImg" alt="">
+  <button type="button" id="imgRm" class="btn btn-red btn-sm"><%= t('removeImage') %></button>
+</div>
+<form id="sendform" method="post" action="/messages/<%= conv.id %>" class="chatbar" enctype="multipart/form-data">
+  <button type="button" class="icon-btn" id="imgBtn" aria-label="<%= t('chooseImage') %>"><%- icon('image') %></button>
+  <input type="file" id="imgInput" name="image" accept="image/*" hidden>
+  <input type="text" name="body" placeholder="<%= t('typeMessage') %>" autocomplete="off" maxlength="2000">
   <button class="icon-btn" type="submit" aria-label="<%= t('send') %>"><%- icon('send') %></button>
 </form>
 <script>
@@ -19,9 +29,14 @@
     lastId=m.id;
     var div=document.createElement('div');
     div.className='bubble '+(m.mine?'mine':'theirs');
-    var p=document.createElement('p'); p.textContent=m.body;
+    if(m.has_image&&m.image_data){
+      var a=document.createElement('a'); a.href=m.image_data; a.target='_blank'; a.rel='noopener';
+      var im=document.createElement('img'); im.className='chat-img'; im.src=m.image_data; im.alt='';
+      a.appendChild(im); div.appendChild(a);
+    }
+    if(m.body){ var p=document.createElement('p'); p.textContent=m.body; div.appendChild(p); }
     var s=document.createElement('small'); s.textContent=new Date(m.created_at).toLocaleString();
-    div.appendChild(p); div.appendChild(s); chat.appendChild(div);
+    div.appendChild(s); chat.appendChild(div);
     chat.scrollTop=chat.scrollHeight;
   }
   async function poll(){
@@ -35,12 +50,27 @@
   setInterval(poll,5000);
   var form=document.getElementById('sendform');
   var input=form.querySelector('input[name=body]');
+  var imgInput=document.getElementById('imgInput'), imgFile=null;
+  document.getElementById('imgBtn').addEventListener('click',function(){ imgInput.click(); });
+  imgInput.addEventListener('change',function(){
+    imgFile=imgInput.files[0]||null;
+    var pv=document.getElementById('imgPrev');
+    if(imgFile){ document.getElementById('imgPrevImg').src=URL.createObjectURL(imgFile); pv.hidden=false; }
+    else pv.hidden=true;
+  });
+  document.getElementById('imgRm').addEventListener('click',function(){
+    imgInput.value=''; imgFile=null; document.getElementById('imgPrev').hidden=true;
+  });
   form.addEventListener('submit',function(e){
     e.preventDefault();
     var text=input.value.trim();
-    if(!text) return;
-    input.value='';
-    fetch(form.action,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-Requested-With':'XMLHttpRequest'},body:'body='+encodeURIComponent(text)})
+    if(!text&&!imgFile) return;
+    var fd=new FormData();
+    fd.append('body',text);
+    if(imgFile) fd.append('image',imgFile);
+    input.value=''; imgInput.value=''; imgFile=null;
+    document.getElementById('imgPrev').hidden=true;
+    fetch(form.action,{method:'POST',headers:{'X-Requested-With':'XMLHttpRequest'},body:fd})
       .then(function(r){ if(r.ok) poll(); else form.submit(); })
       .catch(function(){ form.submit(); });
   });

@@ -74,7 +74,35 @@ router.get('/users', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// All applications (every job, every freelancer)
+// User detail — everything about one user
+router.get('/users/:id', async (req, res, next) => {
+  try {
+    const u = await db.query('SELECT * FROM users WHERE id=$1', [req.params.id]);
+    if (!u.rows.length) return res.status(404).render('404');
+    const user = u.rows[0];
+    let profile = null, counts = {};
+    if (user.role === 'freelancer') {
+      const f = await db.query('SELECT * FROM freelancers WHERE user_id=$1', [user.id]);
+      profile = f.rows[0] || null;
+      const a = await db.query('SELECT COUNT(*)::int AS n FROM applications WHERE freelancer_user_id=$1', [user.id]);
+      counts.applications = a.rows[0].n;
+    } else if (user.role === 'company') {
+      const c = await db.query('SELECT * FROM companies WHERE user_id=$1', [user.id]);
+      profile = c.rows[0] || null;
+      if (profile) {
+        const j = await db.query('SELECT COUNT(*)::int AS n FROM jobs WHERE company_id=$1', [profile.id]);
+        counts.jobs = j.rows[0].n;
+        const a = await db.query(
+          `SELECT COUNT(*)::int AS n FROM applications app JOIN jobs j ON j.id=app.job_id
+           WHERE j.company_id=$1`, [profile.id]);
+        counts.applicationsReceived = a.rows[0].n;
+      }
+    }
+    const m = await db.query('SELECT COUNT(*)::int AS n FROM messages WHERE sender_user_id=$1', [user.id]);
+    counts.messagesSent = m.rows[0].n;
+    res.render('admin/user-detail', { title: user.name, user, profile, counts, tab: 'users' });
+  } catch (e) { next(e); }
+});
 router.get('/applications', async (req, res, next) => {
   try {
     const r = await db.query(

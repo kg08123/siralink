@@ -1,0 +1,11 @@
+<h1 class="page-title"><%= t('notifications') %></h1>
+<% if (!notifs.length) { %><div class="empty"><%= t('noNotifications') %></div><% } %>
+<% notifs.forEach(function(n){ %>
+  <a class="chat-item <%= n.is_read ? '' : 'unread' %>" href="<%= n.link || '/notifications' %>">
+    <div class="grow">
+      <div class="ci-top"><b><%= nt(n.title) %></b><% if (!n.is_read) { %><span class="badge">•</span><% } %></div>
+      <div class="sub"><%= nt(n.body) %></div>
+      <div class="ci-prev"><%= new Date(n.created_at).toLocaleString() %></div>
+    </div>
+  </a>
+<% }) %>

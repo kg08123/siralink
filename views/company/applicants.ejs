@@ -3,7 +3,7 @@
 <% if (!apps.length) { %><div class="empty"><%= t('noApplicants') %></div><% } %>
 <% apps.forEach(function(a){ %>
   <div class="job-card">
-    <h3><%= a.freelancer_name %></h3>
+    <h3><a href="/freelancers/<%= a.freelancer_user_id %>" style="color:var(--green)"><%= a.freelancer_name %></a></h3>
     <div class="co-line"><span><%= a.profession ? catName(a.profession, lang) : '' %><%= a.skills ? ' · ' + a.skills : '' %></span></div>
     <% if (a.proposal) { %><p><b><%= t('proposal') %>:</b> <%= a.proposal %></p><% } %>
     <div class="field" style="margin-top:8px"><label><%= t('viewDocs') %></label>

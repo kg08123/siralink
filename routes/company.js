@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const { requireRole } = require('../middleware/auth');
+const { notify } = require('../lib/notify');
 const { CITIES } = require('../i18n');
 const upload = require('../lib/upload');
 const router = express.Router();
@@ -161,18 +162,33 @@ router.get('/jobs/:id/applicants', async (req, res, next) => {
 router.post('/applications/:id/status', async (req, res, next) => {
   try {
     const a = await db.query(
-      `SELECT a.id, a.job_id, a.freelancer_user_id FROM applications a JOIN jobs j ON j.id=a.job_id
+      `SELECT a.id, a.job_id, a.freelancer_user_id, j.title AS job_title, c.company_name
+       FROM applications a JOIN jobs j ON j.id=a.job_id JOIN companies c ON c.id=j.company_id
        WHERE a.id=$1 AND j.company_id=$2`, [req.params.id, req.company.id]);
     if (!a.rows.length) return res.status(404).render('404');
     const status = req.body.status === 'accepted' ? 'accepted' : 'rejected';
     await db.query('UPDATE applications SET status=$1 WHERE id=$2', [status, req.params.id]);
-    if (status === 'accepted') {
-      // Company-initiated conversation opens on accept
-      await db.query(
-        `INSERT INTO conversations(job_id, application_id, company_user_id, freelancer_user_id)
-         VALUES($1,$2,$3,$4) ON CONFLICT (application_id) DO NOTHING`,
-        [a.rows[0].job_id, a.rows[0].id, req.user.id, a.rows[0].freelancer_user_id]);
-    }
+    try {
+      if (status === 'accepted') {
+        // Company-initiated conversation opens on accept
+        const ci = await db.query(
+          `INSERT INTO conversations(job_id, application_id, company_user_id, freelancer_user_id)
+           VALUES($1,$2,$3,$4) ON CONFLICT (application_id) DO NOTHING RETURNING id`,
+          [a.rows[0].job_id, a.rows[0].id, req.user.id, a.rows[0].freelancer_user_id]);
+        let convId = ci.rows.length ? ci.rows[0].id : null;
+        if (!convId) {
+          const ex = await db.query('SELECT id FROM conversations WHERE application_id=$1', [a.rows[0].id]);
+          convId = ex.rows.length ? ex.rows[0].id : null;
+        }
+        await notify(db, a.rows[0].freelancer_user_id, 'application',
+          convId ? '/messages/' + convId : '/f/applications',
+          'notifApprovedT', 'notifApprovedB', [a.rows[0].company_name, a.rows[0].job_title]);
+      } else {
+        await notify(db, a.rows[0].freelancer_user_id, 'application',
+          '/f/applications', 'notifRejectedT', 'notifRejectedB',
+          [a.rows[0].company_name, a.rows[0].job_title]);
+      }
+    } catch (ne) { console.error('notify on decision failed:', ne.message); }
     res.redirect('/c/jobs/' + a.rows[0].job_id + '/applicants');
   } catch (e) { next(e); }
 });

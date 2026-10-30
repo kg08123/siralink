@@ -109,3 +109,20 @@ CREATE TABLE IF NOT EXISTS conversation_reads (
   last_read_at TIMESTAMPTZ DEFAULT NOW(),
   PRIMARY KEY (user_id, conversation_id)
 );
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  kind TEXT,
+  title TEXT,
+  body TEXT,
+  link TEXT,
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS image_data TEXT;
+ALTER TABLE applications ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_id TEXT UNIQUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT;

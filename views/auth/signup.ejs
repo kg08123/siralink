@@ -48,6 +48,10 @@
   <p class="sub" style="font-size:.8rem"><%= t('termsAgree') %></p>
   <button class="btn btn-green" type="submit"><%= t('continue') %></button>
 </form>
+<% if (googleEnabled) { %>
+  <div class="or-row"><span><%= t('or') %></span></div>
+  <a class="btn btn-google" href="/auth/google"><span class="g-logo">G</span> <%= t('withGoogle') %></a>
+<% } %>
 
 <script>
 const radios = document.querySelectorAll('input[name=role]');

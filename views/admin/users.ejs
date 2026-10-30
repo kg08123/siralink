@@ -3,6 +3,6 @@
 <table class="data">
   <tr><th><%= t('name') %></th><th><%= t('phone') %></th><th><%= t('role') %></th></tr>
   <% users.forEach(function(u){ %>
-    <tr><td><%= u.name %></td><td><%= u.phone %></td><td><span class="pill <%= u.role==='admin'?'bad':(u.role==='company'?'warn':'ok') %>"><%= u.role %></span></td></tr>
+    <tr><td><a href="/admin/users/<%= u.id %>" style="color:var(--green);font-weight:700"><%= u.name %></a></td><td><%= u.phone %></td><td><span class="pill <%= u.role==='admin'?'bad':(u.role==='company'?'warn':'ok') %>"><%= u.role %></span></td></tr>
   <% }) %>
 </table>

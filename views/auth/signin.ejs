@@ -12,5 +12,9 @@
   </div>
   <button class="btn btn-green" type="submit"><%= t('signIn') %></button>
 </form>
+<% if (googleEnabled) { %>
+  <div class="or-row"><span><%= t('or') %></span></div>
+  <a class="btn btn-google" href="/auth/google"><span class="g-logo">G</span> <%= t('withGoogle') %></a>
+<% } %>
 <p class="sub" style="text-align:center;margin-top:14px"><%= t('newHere') %> <a href="/signup" style="color:var(--green);font-weight:700"><%= t('createAccount') %></a></p>
 <p class="sub" style="text-align:center;font-size:.8rem"><%= t('adminLoginNote') %></p>

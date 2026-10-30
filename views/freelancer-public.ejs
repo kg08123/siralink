@@ -1,0 +1,26 @@
+<div class="detail-head">
+  <% if (freelancer.avatar_url) { %>
+    <img class="avatar-lg" src="<%= freelancer.avatar_url %>" alt="<%= freelancer.name %>">
+  <% } else { %>
+    <div class="avatar-lg avatar-ph"><%- icon('users') %></div>
+  <% } %>
+  <div>
+    <h1 class="page-title" style="margin:0"><%= freelancer.name %></h1>
+    <p class="sub"><%= freelancer.profession ? catName(freelancer.profession, lang) : t('freelancer') %></p>
+  </div>
+</div>
+
+<div class="stats-line">
+  <div class="stat"><span class="count"><%= appCount %></span><span><%= t('applications') %></span></div>
+  <div class="stat"><span class="count"><%= freelancer.phone %></span><span><%= t('phone') %></span></div>
+</div>
+
+<% if (freelancer.skills) { %>
+  <div class="section"><h3><%= t('skills') %></h3><p><%= freelancer.skills %></p></div>
+<% } %>
+<% if (freelancer.bio) { %>
+  <div class="section"><h3><%= t('bio') %></h3><p><%= freelancer.bio %></p></div>
+<% } %>
+<% if (freelancer.email) { %>
+  <div class="section"><h3><%= t('email') %></h3><p><%= freelancer.email %></p></div>
+<% } %>

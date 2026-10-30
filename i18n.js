@@ -79,6 +79,18 @@ en: {
   messages: 'Messages', noConversations: 'No conversations yet.',
   typeMessage: 'Type a message...', send: 'Send', message: 'Message',
   goDashboard: 'Go to Dashboard', cityPh: 'Type a city or pick from the list',
+  freelancerProfile: 'Freelancer profile', userDetail: 'User detail', email: 'Email',
+  googleLinked: 'Google-linked account', notifications: 'Notifications',
+  noNotifications: 'No notifications yet.', withGoogle: 'Continue with Google',
+  chooseImage: 'Attach image', removeImage: 'Remove',
+  messagesSent: 'Messages sent', jobsPosted: 'Jobs posted', viewProfile: 'View profile',
+  notifNewAppT: 'New application', notifNewAppB: '{0} applied to "{1}"',
+  notifApprovedT: 'Application approved',
+  notifApprovedB: '{0} accepted your application for "{1}". You can now chat.',
+  notifRejectedT: 'Application update',
+  notifRejectedB: '{0} did not select your application for "{1}".',
+  notifReminderT: 'Application reminder',
+  notifReminderB: '{0}\'s application for "{1}" has been waiting 24 hours.',
 },
 am: {
   appTag: 'የኢትዮጵያ የነፃ ሰራተኞች መድረክ',
@@ -159,6 +171,18 @@ am: {
   messages: 'መልዕክቶች', noConversations: 'እስካሁን ምንም ውይይቶች የሉም።',
   typeMessage: 'መልዕክት ጻፍ...', send: 'ላክ', message: 'መልዕክት ላክ',
   goDashboard: 'ወደ ዳሽቦርድ ሂድ', cityPh: 'ከተማውን ጻፍ ወይም ከዝርዝሩ ምረጥ',
+  freelancerProfile: 'የነፃ ሰራተኛ መገለጫ', userDetail: 'የተጠቃሚ ዝርዝር', email: 'ኢሜይል',
+  googleLinked: 'በጉግል የተገናኘ መለያ', notifications: 'ማሳወቂያዎች',
+  noNotifications: 'እስካሁን ምንም ማሳወቂያ የለም።', withGoogle: 'በጉግል ቀጥል',
+  chooseImage: 'ምስል አያይዝ', removeImage: 'አስወግድ',
+  messagesSent: 'የተላኩ መልዕክቶች', jobsPosted: 'የታተሙ ስራዎች', viewProfile: 'መገለጫ እይ',
+  notifNewAppT: 'አዲስ ማመልከቻ', notifNewAppB: '{0} ለ"{1}" አመልክቷል',
+  notifApprovedT: 'ማመልከቻ ጸድቋል',
+  notifApprovedB: '{0} ለ"{1}" ያቀረብከውን ማመልከቻ ተቀብሏል። አሁን መወያየት ትችላለህ።',
+  notifRejectedT: 'የማመልከቻ ዝመና',
+  notifRejectedB: '{0} ለ"{1}" ያቀረብከውን ማመልከቻ አልመረጠም።',
+  notifReminderT: 'የማመልከቻ ማስታወሻ',
+  notifReminderB: 'የ{0} ለ"{1}" ማመልከቻ 24 ሰዓት እየጠበቀ ነው።',
 }};
 
 // Categories and cities with translations
@@ -187,6 +211,16 @@ function t(lang, key) {
   const L = STR[lang] || STR.en;
   return L[key] !== undefined ? L[key] : (STR.en[key] || key);
 }
+// Render a stored notification title/body: JSON {k: i18nKey, p: [params]} -> localized string
+function nt(lang, stored) {
+  try {
+    const o = typeof stored === 'string' ? JSON.parse(stored) : stored;
+    if (!o || !o.k) return String(stored || '');
+    let s = t(lang, o.k);
+    (o.p || []).forEach((v, i) => { s = s.split('{' + i + '}').join(String(v)); });
+    return s;
+  } catch (e) { return String(stored || ''); }
+}
 function catName(slug, lang) {
   const c = CATEGORIES.find((x) => x[0] === slug);
   return c ? (lang === 'am' ? c[2] : c[1]) : slug;
@@ -196,4 +230,4 @@ function cityName(slug, lang) {
   return c ? (lang === 'am' ? c[2] : c[1]) : (slug || '');
 }
 
-module.exports = { STR, t, CATEGORIES, CITIES, catName, cityName };
+module.exports = { STR, t, nt, CATEGORIES, CITIES, catName, cityName };

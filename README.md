@@ -46,6 +46,20 @@ node server.js         # or: npm start
 | `TELEBIRR_NUMBER` | `0911 23 45 67` | Number companies send the job-post fee to |
 | `JOB_POST_FEE_ETB` | `99` | Fee per job post, in ETB |
 | `PORT` | `3000` | HTTP port |
+| `GOOGLE_CLIENT_ID` | — | Google OAuth client ID (enables "Continue with Google") |
+| `GOOGLE_CLIENT_SECRET` | — | Google OAuth client secret |
+| `BASE_URL` | `https://siralink.onrender.com` | Public base URL (used for the Google OAuth callback) |
+
+## Google Sign-In setup (optional)
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials.
+2. Create Credentials → OAuth client ID → Web application.
+3. Under "Authorized redirect URIs" add exactly:
+   `https://siralink.onrender.com/auth/google/callback`
+4. Copy the Client ID and Client secret into Render → your service → Environment:
+   `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, then save (triggers a redeploy).
+5. The "Continue with Google" buttons appear on the sign-in / sign-up pages.
+   Without these vars the buttons stay hidden and password sign-in works as before.
 
 ## Deploy for free: Render (app) + Neon (database)
 
