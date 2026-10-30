@@ -9,13 +9,26 @@ const { t, CATEGORIES, CITIES, catName, cityName } = require('./i18n');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Auto-apply schema on production boot (Render + Neon). Idempotent (IF NOT EXISTS).
+// Production boot data (Render + Neon): ensure schema, optionally seed demo data once.
 if (process.env.DATABASE_URL && !process.env.USE_PGMEM) {
   const fs = require('fs');
   const schema = fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8');
   db.query(schema)
     .then(() => console.log('schema ensured'))
-    .catch((e) => console.error('auto-migrate failed:', e.message));
+    .then(async () => {
+      if (process.env.SEED_DEMO !== '1') return;
+      const { rows } = await db.query('SELECT COUNT(*)::int AS n FROM users');
+      if (rows[0].n > 0) { console.log('seed skipped: users exist'); return; }
+      console.log('seeding demo data...');
+      await require('./db/seed').main({ keepAlive: true });
+      if (process.env.ADMIN_PASSWORD) {
+        const bcrypt = require('bcryptjs');
+        const h = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
+        await db.query("UPDATE users SET password_hash=$1 WHERE role='admin'");
+        console.log('admin password rotated');
+      }
+    })
+    .catch((e) => console.error('boot data failed:', e.message));
 }
 
 app.set('view engine', 'ejs');
