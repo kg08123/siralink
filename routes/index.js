@@ -50,18 +50,40 @@ const SORTS = {
   likes: 'like_count DESC, j.created_at DESC',
 };
 
+// Word-based search: split query into words; a job matches if ANY word hits
+// title/description/company/city (partial matches kept, ranked below full matches).
+// Relevance score per word: title=3, company=2, description=1, city=1.
+function buildSearch(words, startIdx) {
+  const ors = [], scores = [], params = [];
+  let i = startIdx;
+  for (const w of words) {
+    params.push(`%${w}%`);
+    ors.push(`(j.title ILIKE $${i} OR c.company_name ILIKE $${i} OR j.description ILIKE $${i} OR j.city ILIKE $${i})`);
+    scores.push(`(CASE WHEN j.title ILIKE $${i} THEN 3 ELSE 0 END + CASE WHEN c.company_name ILIKE $${i} THEN 2 ELSE 0 END + CASE WHEN j.description ILIKE $${i} THEN 1 ELSE 0 END + CASE WHEN j.city ILIKE $${i} THEN 1 ELSE 0 END)`);
+    i++;
+  }
+  return { ors, scores, params, nextIdx: i };
+}
+
 function buildFilters(q) {
   const where = ['j.published = TRUE', "j.payment_status = 'approved'"];
   const params = [];
-  let i = 1;
-  if (q.q) { where.push(`(j.title ILIKE $${i} OR j.description ILIKE $${i} OR c.company_name ILIKE $${i})`); params.push(`%${q.q}%`); i++; }
+  let i = 1, score = '0';
+  const words = (q.q || '').trim().split(/\s+/).filter(Boolean);
+  if (words.length) {
+    const s = buildSearch(words, i);
+    where.push('(' + s.ors.join(' OR ') + ')');
+    params.push(...s.params);
+    i = s.nextIdx;
+    score = s.scores.join(' + ');
+  }
   if (q.work_type === 'online' || q.work_type === 'offline') { where.push(`j.work_type = $${i}`); params.push(q.work_type); i++; }
   if (q.category) { where.push(`j.category = $${i}`); params.push(q.category); i++; }
   if (q.city) { where.push(`j.city = $${i}`); params.push(q.city); i++; }
   if (q.min && !isNaN(Number(q.min))) { where.push(`j.budget_etb >= $${i}`); params.push(Number(q.min)); i++; }
   if (q.max && !isNaN(Number(q.max))) { where.push(`j.budget_etb <= $${i}`); params.push(Number(q.max)); i++; }
   if (q.verified === '1') { where.push('c.verified = TRUE'); }
-  return { where: where.join(' AND '), params };
+  return { where: where.join(' AND '), params, score };
 }
 
 // Home: job feed + filters
@@ -74,10 +96,13 @@ router.get('/', async (req, res, next) => {
       sort: Object.keys(SORTS).includes(req.query.sort) ? req.query.sort : 'newest',
       verified: req.query.verified === '1' ? '1' : '',
     };
-    const { where, params } = buildFilters(f);
-    const r = await db.query(`SELECT ${JOB_COLS} ${JOB_FROM} WHERE ${where} ORDER BY ${SORTS[f.sort]} LIMIT 100`, params);
+    const { where, params, score } = buildFilters(f);
+    const hasQ = (f.q || '').trim().length > 0;
+    const orderBy = hasQ ? `(${score}) DESC, ${SORTS[f.sort]}` : SORTS[f.sort];
+    const r = await db.query(`SELECT ${JOB_COLS} ${JOB_FROM} WHERE ${where} ORDER BY ${orderBy} LIMIT 100`, params);
     const jobs = await enrichJobs(r.rows, req.user && req.user.id);
-    res.render('home', { title: res.locals.t('home'), jobs, f });
+    const cr = await db.query(`SELECT DISTINCT city FROM jobs WHERE published = TRUE AND city IS NOT NULL AND city <> '' ORDER BY city`);
+    res.render('home', { title: res.locals.t('home'), jobs, f, cities: cr.rows.map((x) => x.city) });
   } catch (e) { next(e); }
 });
 

@@ -4,7 +4,7 @@
     <div>
       <div style="font-weight:800;font-size:1.15rem"><%= company.company_name %>
         <% if (company.verified) { %> <span class="badge-verified">✓ <%= t('verified') %></span><% } %></div>
-      <div class="mi"><%- icon('heart') %> <b><%= totalLikes %></b>
+      <div class="mi"><%- icon('star') %> <b><%= totalLikes %></b>
         <span style="color:var(--muted)">(<%= reviewCount %> <%= t('reviews') %>)</span></div>
     </div>
   </div>

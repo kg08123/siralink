@@ -23,9 +23,11 @@
   </div>
   <div class="field">
     <label><%= t('location') %></label>
-    <select name="city">
-      <% CITIES.forEach(function(c){ %><option value="<%= c[0] %>"><%= lang==='am'?c[2]:c[1] %></option><% }) %>
-    </select>
+    <input type="text" name="city" list="cityList" placeholder="<%= t('cityPh') %>" autocomplete="off">
+    <datalist id="cityList">
+      <% CITIES.forEach(function(c){ %><option value="<%= c[0] %>" label="<%= lang==='am'?c[2]:c[1] %>"><% }) %>
+      <% (dbCities||[]).forEach(function(c){ %><option value="<%= c %>" label="<%= cityName(c, lang) %>"><% }) %>
+    </datalist>
   </div>
   <div class="field">
     <label><%= t('budgetETB') %></label>

@@ -105,6 +105,19 @@ app.use(async (req, res, next) => {
   }
   res.locals.user = req.user;
   res.locals.company = req.company;
+  // Unread message count for the header badge
+  res.locals.unreadCount = 0;
+  if (req.user) {
+    try {
+      const u = await db.query(
+        `SELECT COUNT(*)::int AS n FROM messages m JOIN conversations c ON c.id=m.conversation_id
+         LEFT JOIN conversation_reads r ON r.conversation_id=c.id AND r.user_id=$1
+         WHERE (c.company_user_id=$1 OR c.freelancer_user_id=$1)
+           AND m.sender_user_id<>$1 AND m.created_at > COALESCE(r.last_read_at, '1970-01-01')`,
+        [req.user.id]);
+      res.locals.unreadCount = u.rows[0].n;
+    } catch (e) { /* tables may not exist on first boot */ }
+  }
   next();
 });
 
@@ -115,6 +128,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/messages', require('./routes/messages'));
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/auth'));
 app.use('/f', require('./routes/freelancer'));

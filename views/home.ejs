@@ -1,3 +1,6 @@
+<% if (user && user.role === 'company') { %>
+  <a class="btn btn-green dash-cta" href="/c/dashboard"><%- icon('grid') %> <%= t('goDashboard') %></a>
+<% } %>
 <form method="get" action="/" id="searchForm">
   <div class="searchbar">
     <input type="text" name="q" placeholder="<%= t('searchJobs') %>" value="<%= f.q || '' %>">
@@ -8,8 +11,8 @@
   <% if (f.category) { %><input type="hidden" name="category" value="<%= f.category %>"><% } %>
   <div class="chips">
     <a class="chip <%= !f.work_type ? 'on' : '' %>" href="?<%= qs({work_type:''}) %>"><%= t('all') %></a>
-    <a class="chip <%= f.work_type==='online' ? 'on' : '' %>" href="?<%= qs({work_type:'online'}) %>"><%= t('online') %></a>
-    <a class="chip <%= f.work_type==='offline' ? 'on' : '' %>" href="?<%= qs({work_type:'offline'}) %>"><%= t('offline') %></a>
+    <a class="chip chip-online <%= f.work_type==='online' ? 'on' : '' %>" href="?<%= qs({work_type:'online'}) %>"><%= t('online') %></a>
+    <a class="chip chip-offline <%= f.work_type==='offline' ? 'on' : '' %>" href="?<%= qs({work_type:'offline'}) %>"><%= t('offline') %></a>
     <% CATEGORIES.forEach(function(c){ %>
       <a class="chip <%= f.category===c[0] ? 'on' : '' %>" href="?<%= qs({category:c[0]}) %>"><%= lang==='am'?c[2]:c[1] %></a>
     <% }) %>
@@ -19,8 +22,8 @@
       <label><%= t('city') %></label>
       <select name="city">
         <option value=""><%= t('all') %></option>
-        <% CITIES.forEach(function(c){ %>
-          <option value="<%= c[0] %>" <%= f.city===c[0]?'selected':'' %>><%= lang==='am'?c[2]:c[1] %></option>
+        <% (cities||[]).forEach(function(c){ %>
+          <option value="<%= c %>" <%= f.city===c?'selected':'' %>><%= cityName(c, lang) %></option>
         <% }) %>
       </select>
     </div>

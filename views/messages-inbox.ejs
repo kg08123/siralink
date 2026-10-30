@@ -1,0 +1,11 @@
+<h1 class="page-title"><%= t('messages') %></h1>
+<% if (!convs.length) { %><div class="empty"><%= t('noConversations') %></div><% } %>
+<% convs.forEach(function(c){ %>
+  <a class="chat-item" href="/messages/<%= c.id %>">
+    <div class="grow">
+      <div class="ci-top"><b><%= c.other_name %></b><% if (c.unread) { %><span class="badge"><%= c.unread %></span><% } %></div>
+      <div class="sub"><%= c.job_title %></div>
+      <div class="ci-prev"><%= c.lastBody %></div>
+    </div>
+  </a>
+<% }) %>

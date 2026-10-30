@@ -22,5 +22,10 @@
         <form method="post" action="/c/applications/<%= a.id %>/status"><input type="hidden" name="status" value="rejected"><button class="btn btn-red btn-sm" type="submit">✕ <%= t('markRejected') %></button></form>
       </div>
     <% } %>
+    <% if (a.status === 'accepted' && convMap[a.id]) { %>
+      <div class="row-actions" style="margin-top:8px">
+        <a class="btn btn-green btn-sm" href="/messages/<%= convMap[a.id] %>"><%- icon('comment') %> <%= t('message') %></a>
+      </div>
+    <% } %>
   </div>
 <% }) %>

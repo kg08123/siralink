@@ -12,6 +12,7 @@
     <a class="logo" href="/"><span class="logo-mark">S</span>SiraLink</a>
     <nav class="navlinks">
       <% if (user) { %>
+        <a class="msg-ico" href="/messages" aria-label="<%= t('messages') %>"><%- icon('comment') %><% if (unreadCount > 0) { %><span class="badge"><%= unreadCount > 99 ? '99+' : unreadCount %></span><% } %></a>
         <div class="menu-wrap">
           <button class="hamb" id="menuBtn" aria-label="menu" aria-haspopup="true"><%- icon('menu') %></button>
           <div class="menu-drop" id="menuDrop" hidden>

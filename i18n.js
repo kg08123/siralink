@@ -76,6 +76,9 @@ en: {
   mostLiked: 'Most liked', verifiedOnly: 'Verified companies only',
   applyFilters: 'Apply filters', likes: 'Likes',
   applications: 'Applications', download: 'Download',
+  messages: 'Messages', noConversations: 'No conversations yet.',
+  typeMessage: 'Type a message...', send: 'Send', message: 'Message',
+  goDashboard: 'Go to Dashboard', cityPh: 'Type a city or pick from the list',
 },
 am: {
   appTag: 'የኢትዮጵያ የነፃ ሰራተኞች መድረክ',
@@ -153,6 +156,9 @@ am: {
   mostLiked: 'በጣም የተወደዱ', verifiedOnly: 'የተረጋገጡ ኩባንያዎች ብቻ',
   applyFilters: 'ማጣሪያዎችን ተግብር', likes: 'ላይኮች',
   applications: 'ማመልከቻዎች', download: 'አውርድ',
+  messages: 'መልዕክቶች', noConversations: 'እስካሁን ምንም ውይይቶች የሉም።',
+  typeMessage: 'መልዕክት ጻፍ...', send: 'ላክ', message: 'መልዕክት ላክ',
+  goDashboard: 'ወደ ዳሽቦርድ ሂድ', cityPh: 'ከተማውን ጻፍ ወይም ከዝርዝሩ ምረጥ',
 }};
 
 // Categories and cities with translations

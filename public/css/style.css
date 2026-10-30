@@ -135,11 +135,11 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .mi{display:inline-flex;align-items:center;gap:4px}
 .like-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:var(--muted);font-weight:700;font-size:.9rem;padding:4px 2px;font-family:inherit;text-decoration:none}
 .like-btn .ico{width:19px;height:19px}
-.like-btn.liked{color:#e0245e}
-.like-btn.liked .ico{fill:#e0245e;stroke:#e0245e}
+.like-btn.liked{color:var(--amber)}
+.like-btn.liked .ico{fill:var(--amber);stroke:var(--amber)}
 .box.like-btn{flex-direction:column;justify-content:center;gap:2px;font-size:1rem;color:var(--ink);width:100%}
 .box.like-btn .ico{width:22px;height:22px;color:var(--muted)}
-.box.like-btn.liked .ico{color:#e0245e}
+.box.like-btn.liked .ico{color:var(--amber);fill:var(--amber)}
 .box.like-btn b{font-size:1.25rem}
 .filter-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin:4px 0 12px}
 .filter-panel[hidden]{display:none}
@@ -154,3 +154,31 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .tabs a{flex:1 0 auto;white-space:nowrap}
 .doc-ico .ico{width:20px;height:20px}
 .toggle2 button .ico{width:18px;height:18px;vertical-align:-3px}
+
+/* Core work-type filters: visually distinct from category chips */
+.chip-online{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.chip-online.on{background:var(--green);border-color:var(--green);color:#fff}
+.chip-offline{background:var(--amber-soft);border-color:var(--amber);color:#8a5a0a}
+.chip-offline.on{background:var(--amber);border-color:var(--amber);color:#1a1a1a}
+/* Header message icon with unread badge */
+.msg-ico{position:relative;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink)}
+.msg-ico .ico{width:20px;height:20px}
+.msg-ico .badge{position:absolute;top:-7px;right:-7px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:var(--red);color:#fff;font-size:.68rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+/* Company dashboard shortcut on home */
+.dash-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 0}
+.dash-cta .ico{width:20px;height:20px}
+/* Chat */
+.chat-item{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;text-decoration:none;color:inherit}
+.chat-item .grow{flex:1;min-width:0}
+.ci-top{display:flex;align-items:center;gap:8px}
+.ci-top .badge{background:var(--green);color:#fff;font-size:.7rem;font-weight:800;border-radius:999px;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.ci-prev{color:var(--muted);font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.chat{display:flex;flex-direction:column;gap:8px;padding:6px 0 12px;max-height:60vh;overflow-y:auto}
+.bubble{max-width:80%;padding:10px 13px;border-radius:16px;background:#fff;border:1px solid var(--line)}
+.bubble p{margin:0;white-space:pre-wrap;word-break:break-word}
+.bubble small{color:var(--muted);font-size:.7rem}
+.bubble.mine{align-self:flex-end;background:var(--green);border-color:var(--green);color:#fff;border-bottom-right-radius:4px}
+.bubble.mine small{color:#d7efe2}
+.bubble.theirs{align-self:flex-start;border-bottom-left-radius:4px}
+.chatbar{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 0 calc(10px + env(safe-area-inset-bottom));background:var(--bg)}
+.chatbar input{flex:1;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1rem;background:#fff}

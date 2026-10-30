@@ -85,3 +85,27 @@ CREATE TABLE IF NOT EXISTS job_likes (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   PRIMARY KEY (job_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS conversations (
+  id SERIAL PRIMARY KEY,
+  job_id INT REFERENCES jobs(id) ON DELETE CASCADE,
+  application_id INT UNIQUE REFERENCES applications(id) ON DELETE CASCADE,
+  company_user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  freelancer_user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+  id SERIAL PRIMARY KEY,
+  conversation_id INT REFERENCES conversations(id) ON DELETE CASCADE,
+  sender_user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  body TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS conversation_reads (
+  user_id INT REFERENCES users(id) ON DELETE CASCADE,
+  conversation_id INT REFERENCES conversations(id) ON DELETE CASCADE,
+  last_read_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (user_id, conversation_id)
+);

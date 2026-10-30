@@ -14,10 +14,10 @@
   <div class="stats-line">
     <% if (user) { %>
       <button type="button" class="like-btn <%= j.liked ? 'liked' : '' %>" data-job="<%= j.id %>" aria-label="like">
-        <%- icon('heart') %><span class="like-count"><%= j.like_count %></span>
+        <%- icon('star') %><span class="like-count"><%= j.like_count %></span>
       </button>
     <% } else { %>
-      <a class="like-btn" href="/signin" aria-label="like"><%- icon('heart') %><span class="like-count"><%= j.like_count %></span></a>
+      <a class="like-btn" href="/signin" aria-label="like"><%- icon('star') %><span class="like-count"><%= j.like_count %></span></a>
     <% } %>
     <span class="stat-ico"><%- icon('comment') %> <%= j.comment_count %></span>
     <span class="stat-ico"><%- icon('users') %> <%= j.applied_count %> <%= t('applied') %></span>

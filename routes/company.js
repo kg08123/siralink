@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const { requireRole } = require('../middleware/auth');
+const { CITIES } = require('../i18n');
 const upload = require('../lib/upload');
 const router = express.Router();
 
@@ -26,12 +27,17 @@ router.get('/dashboard', async (req, res, next) => {
 });
 
 // Post a job — step 1: details
-router.get('/post', (req, res) => {
-  if (req.company.verification_status !== 'approved') {
-    req.session.flash = { type: 'err', msg: res.locals.t('unverifiedNote') };
-    return res.redirect('/c/dashboard');
-  }
-  res.render('company/post1', { title: res.locals.t('postJob') });
+router.get('/post', async (req, res, next) => {
+  try {
+    if (req.company.verification_status !== 'approved') {
+      req.session.flash = { type: 'err', msg: res.locals.t('unverifiedNote') };
+      return res.redirect('/c/dashboard');
+    }
+    const cr = await db.query(`SELECT DISTINCT city FROM jobs WHERE city IS NOT NULL AND city <> '' ORDER BY city`);
+    const known = new Set(CITIES.map((c) => c[0]));
+    const dbCities = cr.rows.map((x) => x.city).filter((c) => !known.has(c));
+    res.render('company/post1', { title: res.locals.t('postJob'), dbCities });
+  } catch (e) { next(e); }
 });
 
 router.post('/post', async (req, res, next) => {
@@ -54,7 +60,7 @@ router.post('/post', async (req, res, next) => {
        VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
       [req.company.id, title.trim(), category,
        work_type === 'online' ? 'online' : 'offline',
-       city || null, budget_etb ? Number(budget_etb) : null,
+       (city || '').trim() || null, budget_etb ? Number(budget_etb) : null,
        (description || '').trim() || null, docs.join(', ')]);
     req.session.flash = { type: 'ok', msg: t('jobPosted') };
     res.redirect('/c/post/payment/' + r.rows[0].id);
@@ -122,7 +128,7 @@ router.get('/jobs/:id/applicants', async (req, res, next) => {
     const j = await db.query('SELECT * FROM jobs WHERE id=$1 AND company_id=$2', [req.params.id, req.company.id]);
     if (!j.rows.length) return res.status(404).render('404');
     const r = await db.query(
-      `SELECT a.id, a.proposal, a.status, a.created_at, u.name AS freelancer_name, f.profession, f.skills
+      `SELECT a.id, a.freelancer_user_id, a.proposal, a.status, a.created_at, u.name AS freelancer_name, f.profession, f.skills
        FROM applications a JOIN users u ON u.id=a.freelancer_user_id
        LEFT JOIN freelancers f ON f.user_id=u.id
        WHERE a.job_id=$1 ORDER BY a.created_at DESC`, [req.params.id]);
@@ -131,7 +137,23 @@ router.get('/jobs/:id/applicants', async (req, res, next) => {
       const d = await db.query('SELECT doc_name, file_path FROM application_docs WHERE application_id=$1', [a.id]);
       docs[a.id] = d.rows;
     }
-    res.render('company/applicants', { title: res.locals.t('applicants'), job: j.rows[0], apps: r.rows, docs });
+    // Ensure a conversation exists for every accepted application (company-initiated messaging)
+    for (const a of r.rows) {
+      if (a.status === 'accepted') {
+        await db.query(
+          `INSERT INTO conversations(job_id, application_id, company_user_id, freelancer_user_id)
+           VALUES($1,$2,$3,$4) ON CONFLICT (application_id) DO NOTHING`,
+          [req.params.id, a.id, req.user.id, a.freelancer_user_id]);
+      }
+    }
+    let convMap = {};
+    if (r.rows.length) {
+      const appIds = r.rows.map((a) => a.id);
+      const iph = appIds.map((_, i) => `$${i + 1}`).join(',');
+      const cm = await db.query(`SELECT id, application_id FROM conversations WHERE application_id IN (${iph})`, appIds);
+      convMap = Object.fromEntries(cm.rows.map((x) => [x.application_id, x.id]));
+    }
+    res.render('company/applicants', { title: res.locals.t('applicants'), job: j.rows[0], apps: r.rows, docs, convMap });
   } catch (e) { next(e); }
 });
 
@@ -139,11 +161,18 @@ router.get('/jobs/:id/applicants', async (req, res, next) => {
 router.post('/applications/:id/status', async (req, res, next) => {
   try {
     const a = await db.query(
-      `SELECT a.id, a.job_id FROM applications a JOIN jobs j ON j.id=a.job_id
+      `SELECT a.id, a.job_id, a.freelancer_user_id FROM applications a JOIN jobs j ON j.id=a.job_id
        WHERE a.id=$1 AND j.company_id=$2`, [req.params.id, req.company.id]);
     if (!a.rows.length) return res.status(404).render('404');
     const status = req.body.status === 'accepted' ? 'accepted' : 'rejected';
     await db.query('UPDATE applications SET status=$1 WHERE id=$2', [status, req.params.id]);
+    if (status === 'accepted') {
+      // Company-initiated conversation opens on accept
+      await db.query(
+        `INSERT INTO conversations(job_id, application_id, company_user_id, freelancer_user_id)
+         VALUES($1,$2,$3,$4) ON CONFLICT (application_id) DO NOTHING`,
+        [a.rows[0].job_id, a.rows[0].id, req.user.id, a.rows[0].freelancer_user_id]);
+    }
     res.redirect('/c/jobs/' + a.rows[0].job_id + '/applicants');
   } catch (e) { next(e); }
 });

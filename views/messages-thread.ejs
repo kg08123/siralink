@@ -1,0 +1,35 @@
+<h1 class="page-title"><%= conv.other_name %></h1>
+<p class="sub"><%= conv.job_title %></p>
+<div class="chat" id="chat">
+  <% messages.forEach(function(m){ %>
+    <div class="bubble <%= m.sender_user_id===user.id?'mine':'theirs' %>"><p><%= m.body %></p><small><%= new Date(m.created_at).toLocaleString() %></small></div>
+  <% }) %>
+</div>
+<form method="post" action="/messages/<%= conv.id %>" class="chatbar">
+  <input type="text" name="body" placeholder="<%= t('typeMessage') %>" required autocomplete="off" maxlength="2000">
+  <button class="icon-btn" type="submit" aria-label="<%= t('send') %>"><%- icon('send') %></button>
+</form>
+<script>
+(function(){
+  var chat=document.getElementById('chat');
+  var lastId=<%= messages.length ? messages[messages.length-1].id : 0 %>;
+  chat.scrollTop=chat.scrollHeight;
+  setInterval(async function(){
+    try{
+      var r=await fetch('/messages/<%= conv.id %>/json?after='+lastId,{headers:{'Accept':'application/json'}});
+      if(!r.ok) return;
+      var d=await r.json();
+      d.messages.forEach(function(m){
+        if(m.id<=lastId) return;
+        lastId=m.id;
+        var div=document.createElement('div');
+        div.className='bubble '+(m.mine?'mine':'theirs');
+        var p=document.createElement('p'); p.textContent=m.body;
+        var s=document.createElement('small'); s.textContent=new Date(m.created_at).toLocaleString();
+        div.appendChild(p); div.appendChild(s); chat.appendChild(div);
+      });
+      if(d.messages.length) chat.scrollTop=chat.scrollHeight;
+    }catch(e){}
+  },5000);
+})();
+</script>
