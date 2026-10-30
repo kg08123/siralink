@@ -74,6 +74,28 @@ router.get('/users', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// All applications (every job, every freelancer)
+router.get('/applications', async (req, res, next) => {
+  try {
+    const r = await db.query(
+      `SELECT a.id, a.proposal, a.status, a.created_at,
+              u.name AS freelancer_name, u.phone AS freelancer_phone,
+              j.title AS job_title, c.company_name
+       FROM applications a
+       JOIN users u ON u.id = a.freelancer_user_id
+       JOIN jobs j ON j.id = a.job_id
+       JOIN companies c ON c.id = j.company_id
+       ORDER BY a.created_at DESC LIMIT 200`);
+    const apps = r.rows;
+    const docs = {};
+    for (const a of apps) {
+      const d = await db.query('SELECT doc_name, file_path FROM application_docs WHERE application_id=$1', [a.id]);
+      docs[a.id] = d.rows;
+    }
+    res.render('admin/applications', { title: res.locals.t('applications'), apps, docs, tab: 'apps' });
+  } catch (e) { next(e); }
+});
+
 // All jobs
 router.get('/jobs', async (req, res, next) => {
   try {

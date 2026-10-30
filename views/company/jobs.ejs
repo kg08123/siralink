@@ -7,7 +7,7 @@
     <div class="meta-line">
       <span class="tag <%= j.work_type==='online'?'tag-online':'tag-offline' %>"><%= t(j.work_type) %></span>
       <span><%= fmtETB(j.budget_etb) %></span>
-      <span>👥 <%= j.applied_count %></span>
+      <span class="stat-ico"><%- icon('users') %> <%= j.applied_count %></span>
     </div>
     <div class="meta-line">
       <span class="pill <%= j.published?'ok':'warn' %>"><%= j.published ? t('published') : t('awaitingPayment') %></span>

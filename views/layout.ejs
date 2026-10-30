@@ -12,18 +12,22 @@
     <a class="logo" href="/"><span class="logo-mark">S</span>SiraLink</a>
     <nav class="navlinks">
       <% if (user) { %>
-        <% if (user.role === 'freelancer') { %>
-          <a href="/f/dashboard"><%= t('dashboard') %></a>
-          <a href="/f/applications"><%= t('myApplications') %></a>
-        <% } else if (user.role === 'company') { %>
-          <a href="/c/dashboard"><%= t('dashboard') %></a>
-          <a href="/c/jobs"><%= t('myJobs') %></a>
-        <% } else if (user.role === 'admin') { %>
-          <a href="/admin"><%= t('adminPanel') %></a>
-        <% } %>
-        <a href="/signout"><%= t('signOut') %></a>
+        <div class="menu-wrap">
+          <button class="hamb" id="menuBtn" aria-label="menu" aria-haspopup="true"><%- icon('menu') %></button>
+          <div class="menu-drop" id="menuDrop" hidden>
+            <% if (user.role === 'freelancer') { %>
+              <a href="/f/dashboard"><%= t('dashboard') %></a>
+              <a href="/f/applications"><%= t('myApplications') %></a>
+            <% } else if (user.role === 'company') { %>
+              <a href="/c/dashboard"><%= t('dashboard') %></a>
+              <a href="/c/jobs"><%= t('myJobs') %></a>
+              <a href="/c/post"><%= t('postJob') %></a>
+            <% } %>
+            <a href="/signout"><%= t('signOut') %></a>
+          </div>
+        </div>
       <% } else { %>
-        <a href="/signin"><%= t('signIn') %></a>
+        <a class="btn-signin" href="/signin"><%= t('signIn') %></a>
       <% } %>
       <span class="lang-toggle">
         <a href="?lang=en" class="<%= lang==='en'?'on':'' %>">EN</a><a href="?lang=am" class="<%= lang==='am'?'on':'' %>">አማ</a>
@@ -38,6 +42,27 @@
 <footer class="footer">SiraLink · <%= t('appTag') %> · Addis Ababa, Ethiopia</footer>
 <script>
 function copyNum(id){const el=document.getElementById(id);if(!el)return;navigator.clipboard&&navigator.clipboard.writeText(el.innerText.trim());}
+// Hamburger menu toggle
+(function(){
+  var b=document.getElementById('menuBtn'), d=document.getElementById('menuDrop');
+  if(!b||!d) return;
+  b.addEventListener('click', function(e){ e.stopPropagation(); d.hidden=!d.hidden; });
+  document.addEventListener('click', function(e){ if(!d.hidden && !d.contains(e.target)) d.hidden=true; });
+})();
+// Like button toggle (no page reload)
+document.addEventListener('click', async function(e){
+  var btn=e.target.closest('.like-btn');
+  if(!btn || btn.tagName==='A') return;
+  e.preventDefault(); e.stopPropagation();
+  try{
+    var r=await fetch('/jobs/'+btn.dataset.job+'/like',{method:'POST',headers:{'Accept':'application/json'}});
+    if(r.redirected || r.url.indexOf('/signin')!==-1){ window.location.href='/signin'; return; }
+    if(!r.ok) return;
+    var data=await r.json();
+    btn.classList.toggle('liked', !!data.liked);
+    var c=btn.querySelector('.like-count'); if(c) c.textContent=data.count;
+  }catch(err){}
+});
 </script>
 </body>
 </html>

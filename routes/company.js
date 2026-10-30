@@ -16,9 +16,11 @@ router.get('/dashboard', async (req, res, next) => {
     const jobs = await db.query('SELECT COUNT(*) AS total, SUM(CASE WHEN published THEN 1 ELSE 0 END) AS live FROM jobs WHERE company_id=$1', [co.id]);
     const apps = await db.query(
       'SELECT COUNT(*) AS total FROM applications a JOIN jobs j ON j.id=a.job_id WHERE j.company_id=$1', [co.id]);
+    const likes = await db.query(
+      'SELECT COUNT(*)::int AS n FROM job_likes l JOIN jobs j ON j.id=l.job_id WHERE j.company_id=$1', [co.id]);
     res.render('company/dashboard', {
       title: res.locals.t('dashboard'), company: co,
-      jobStats: jobs.rows[0], appCount: apps.rows[0].total,
+      jobStats: jobs.rows[0], appCount: apps.rows[0].total, totalLikes: likes.rows[0].n,
     });
   } catch (e) { next(e); }
 });

@@ -71,6 +71,11 @@ en: {
   mustBeCompany: 'Only companies can post jobs.',
   signInToApply: 'Sign in as a freelancer to apply.',
   unverifiedNote: 'Your company is awaiting verification. You can post jobs after approval.',
+  filters: 'Filters', sortBy: 'Sort by', newest: 'Newest',
+  budgetHigh: 'Budget: high to low', budgetLow: 'Budget: low to high',
+  mostLiked: 'Most liked', verifiedOnly: 'Verified companies only',
+  applyFilters: 'Apply filters', likes: 'Likes',
+  applications: 'Applications', download: 'Download',
 },
 am: {
   appTag: 'የኢትዮጵያ የነፃ ሰራተኞች መድረክ',
@@ -143,6 +148,11 @@ am: {
   mustBeCompany: 'ስራ መለጠፍ የሚችሉት ኩባንያዎች ብቻ ናቸው።',
   signInToApply: 'ለማመልከት እንደ ነፃ ሰራተኛ ግባ።',
   unverifiedNote: 'ኩባንያዎ በማረጋገጫ ጥበቃ ላይ ነው። ከተፈቀደ በኋላ ስራ መለጠፍ ይችላሉ።',
+  filters: 'ማጣሪያዎች', sortBy: 'ደርድር', newest: 'አዳዲስ',
+  budgetHigh: 'በጀት፡ ከፍተኛ → ዝቅተኛ', budgetLow: 'በጀት፡ ዝቅተኛ → ከፍተኛ',
+  mostLiked: 'በጣም የተወደዱ', verifiedOnly: 'የተረጋገጡ ኩባንያዎች ብቻ',
+  applyFilters: 'ማጣሪያዎችን ተግብር', likes: 'ላይኮች',
+  applications: 'ማመልከቻዎች', download: 'አውርድ',
 }};
 
 // Categories and cities with translations

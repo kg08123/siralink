@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const db = require('./db');
 const { t, CATEGORIES, CITIES, catName, cityName } = require('./i18n');
+const { icon } = require('./lib/icons');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -70,6 +71,7 @@ app.use((req, res, next) => {
     return '★'.repeat(f) + '☆'.repeat(5 - f);
   };
   res.locals.fmtETB = (n) => (n === null || n === undefined || n === '' ? '' : Number(n).toLocaleString('en-US') + ' ETB');
+  res.locals.icon = icon;
   res.locals.CATEGORIES = CATEGORIES;
   res.locals.CITIES = CITIES;
   res.locals.catName = catName;

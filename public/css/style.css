@@ -116,3 +116,41 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .copy-row{display:flex; gap:8px; align-items:center; background:var(--green-soft); border-radius:12px; padding:12px 14px; font-weight:800; font-size:1.1rem; margin:10px 0}
 .footer{max-width:640px; margin:24px auto 0; padding:18px 16px 40px; color:var(--muted); font-size:.82rem; text-align:center}
 [dir=rtl]{text-align:right}
+
+/* --- SiraLink UI refresh: header, likes, filter panel, icons --- */
+.btn-signin{background:var(--green);color:#fff!important;font-weight:800;padding:10px 22px;border-radius:999px;text-decoration:none;box-shadow:0 2px 10px rgba(11,107,63,.35);white-space:nowrap}
+.btn-signin:hover{background:var(--green-dark)}
+.menu-wrap{position:relative}
+.hamb{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.hamb .ico{width:22px;height:22px}
+.menu-drop{position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.14);min-width:200px;z-index:200;padding:6px;display:flex;flex-direction:column}
+.menu-drop[hidden]{display:none}
+.menu-drop a{padding:12px 14px;border-radius:10px;font-weight:600}
+.menu-drop a:hover{background:#f3f4f6}
+.ico{width:18px;height:18px;flex:0 0 auto;vertical-align:-3px}
+.icon-btn{display:flex;align-items:center;justify-content:center}
+.icon-btn .ico{width:22px;height:22px}
+.icon-btn.on{background:var(--green);color:#fff;border-color:var(--green)}
+.stat-ico{display:inline-flex;align-items:center;gap:5px}
+.mi{display:inline-flex;align-items:center;gap:4px}
+.like-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:var(--muted);font-weight:700;font-size:.9rem;padding:4px 2px;font-family:inherit;text-decoration:none}
+.like-btn .ico{width:19px;height:19px}
+.like-btn.liked{color:#e0245e}
+.like-btn.liked .ico{fill:#e0245e;stroke:#e0245e}
+.box.like-btn{flex-direction:column;justify-content:center;gap:2px;font-size:1rem;color:var(--ink);width:100%}
+.box.like-btn .ico{width:22px;height:22px;color:var(--muted)}
+.box.like-btn.liked .ico{color:#e0245e}
+.box.like-btn b{font-size:1.25rem}
+.filter-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin:4px 0 12px}
+.filter-panel[hidden]{display:none}
+.frow{margin-bottom:12px}
+.frow label{display:block;font-weight:700;font-size:.85rem;margin-bottom:6px;color:var(--muted)}
+.frow select,.frow input{width:100%;padding:11px 12px;border-radius:12px;border:1.5px solid var(--line);font-size:1rem;background:#fff;font-family:inherit}
+.frow-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.check{display:flex;align-items:center;gap:8px;font-weight:600;margin:4px 0 12px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--green)}
+.card-link{text-decoration:none;color:inherit;display:block}
+.tabs{overflow-x:auto}
+.tabs a{flex:1 0 auto;white-space:nowrap}
+.doc-ico .ico{width:20px;height:20px}
+.toggle2 button .ico{width:18px;height:18px;vertical-align:-3px}

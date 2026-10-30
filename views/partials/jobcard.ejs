@@ -1,18 +1,26 @@
-<a class="job-card" href="/jobs/<%= j.id %>">
-  <h3><%= j.title %></h3>
-  <div class="co-line">
-    <span><%= j.company_name %></span>
-    <% if (j.verified) { %><span class="badge-verified">✓ <%= t('verified') %></span><% } %>
-  </div>
-  <div class="meta-line">
-    <span><%= cityName(j.city, lang) %></span>·
-    <span class="tag <%= j.work_type === 'online' ? 'tag-online' : 'tag-offline' %>"><%= t(j.work_type) %></span>
-    <span class="budget"><%= fmtETB(j.budget_etb) %></span>
-  </div>
+<div class="job-card">
+  <a class="card-link" href="/jobs/<%= j.id %>">
+    <h3><%= j.title %></h3>
+    <div class="co-line">
+      <span><%= j.company_name %></span>
+      <% if (j.verified) { %><span class="badge-verified">✓ <%= t('verified') %></span><% } %>
+    </div>
+    <div class="meta-line">
+      <span class="mi"><%- icon('pin') %> <%= cityName(j.city, lang) %></span>
+      <span class="tag <%= j.work_type === 'online' ? 'tag-online' : 'tag-offline' %>"><%= t(j.work_type) %></span>
+      <span class="budget mi"><%- icon('cash') %> <%= fmtETB(j.budget_etb) %></span>
+    </div>
+  </a>
   <div class="stats-line">
-    <span class="stars"><%= stars(j.rating_avg) %></span><b><%= Number(j.rating_avg).toFixed(1) %></b>
-    <span>💬 <%= j.comment_count %></span>
-    <span>👥 <%= j.applied_count %> <%= t('applied') %></span>
+    <% if (user) { %>
+      <button type="button" class="like-btn <%= j.liked ? 'liked' : '' %>" data-job="<%= j.id %>" aria-label="like">
+        <%- icon('heart') %><span class="like-count"><%= j.like_count %></span>
+      </button>
+    <% } else { %>
+      <a class="like-btn" href="/signin" aria-label="like"><%- icon('heart') %><span class="like-count"><%= j.like_count %></span></a>
+    <% } %>
+    <span class="stat-ico"><%- icon('comment') %> <%= j.comment_count %></span>
+    <span class="stat-ico"><%- icon('users') %> <%= j.applied_count %> <%= t('applied') %></span>
   </div>
-  <span class="btn btn-green"><%= t('applyNow') %></span>
-</a>
+  <a class="btn btn-green" href="/jobs/<%= j.id %>"><%= t('applyNow') %></a>
+</div>

@@ -16,8 +16,8 @@
   <div class="field">
     <label><%= t('workType') %></label>
     <div class="toggle2">
-      <button type="button" id="wt-online" onclick="setWT('online')">🌐 <%= t('online') %></button>
-      <button type="button" id="wt-offline" class="on" onclick="setWT('offline')">📍 <%= t('offline') %></button>
+      <button type="button" id="wt-online" onclick="setWT('online')"><%- icon('globe') %> <%= t('online') %></button>
+      <button type="button" id="wt-offline" class="on" onclick="setWT('offline')"><%- icon('pin') %> <%= t('offline') %></button>
     </div>
     <input type="hidden" name="work_type" id="work_type" value="offline">
   </div>
@@ -58,7 +58,7 @@ function addDoc(){
   const list = document.getElementById('docList');
   const row = document.createElement('div');
   row.className = 'doc-row';
-  row.innerHTML = '<div class="doc-ico">📄</div><div class="grow"><b></b><input type="hidden" name="docs" value=""></div><button type="button" class="btn btn-red btn-sm">✕</button>';
+  row.innerHTML = '<div class="doc-ico"><%- icon('file') %></div><div class="grow"><b></b><input type="hidden" name="docs" value=""></div><button type="button" class="btn btn-red btn-sm">✕</button>';
   row.querySelector('b').textContent = v;
   row.querySelector('input[type=hidden]').value = v;
   row.querySelector('button').onclick = () => row.remove();

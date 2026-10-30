@@ -9,7 +9,7 @@
     <div class="field" style="margin-top:8px"><label><%= t('viewDocs') %></label>
       <% (docs[a.id]||[]).forEach(function(d){ %>
         <div class="doc-row">
-          <div class="doc-ico">📄</div>
+          <div class="doc-ico"><%- icon('file') %></div>
           <div class="grow"><b><%= d.doc_name %></b></div>
           <% if (d.file_path) { %><a class="btn btn-amber btn-sm" href="<%= d.file_path %>" target="_blank"><%= t('uploaded') %></a><% } else { %><span class="pill wait">—</span><% } %>
         </div>

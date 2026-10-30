@@ -1,8 +1,11 @@
-<form method="get" action="/">
+<form method="get" action="/" id="searchForm">
   <div class="searchbar">
     <input type="text" name="q" placeholder="<%= t('searchJobs') %>" value="<%= f.q || '' %>">
-    <button class="icon-btn" type="submit" aria-label="search">⚙</button>
+    <button class="icon-btn" type="submit" aria-label="<%= t('searchJobs') %>"><%- icon('search') %></button>
+    <button class="icon-btn <%= (f.city||f.min||f.max||f.sort!=='newest'||f.verified)?'on':'' %>" type="button" id="filterToggle" aria-label="<%= t('filters') %>"><%- icon('filter') %></button>
   </div>
+  <% if (f.work_type) { %><input type="hidden" name="work_type" value="<%= f.work_type %>"><% } %>
+  <% if (f.category) { %><input type="hidden" name="category" value="<%= f.category %>"><% } %>
   <div class="chips">
     <a class="chip <%= !f.work_type ? 'on' : '' %>" href="?<%= qs({work_type:''}) %>"><%= t('all') %></a>
     <a class="chip <%= f.work_type==='online' ? 'on' : '' %>" href="?<%= qs({work_type:'online'}) %>"><%= t('online') %></a>
@@ -11,18 +14,46 @@
       <a class="chip <%= f.category===c[0] ? 'on' : '' %>" href="?<%= qs({category:c[0]}) %>"><%= lang==='am'?c[2]:c[1] %></a>
     <% }) %>
   </div>
-  <div class="chips">
-    <select name="city" onchange="this.form.submit()" style="padding:9px 12px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-weight:600">
-      <option value=""><%= t('city') %>: <%= t('all') %></option>
-      <% CITIES.forEach(function(c){ %>
-        <option value="<%= c[0] %>" <%= f.city===c[0]?'selected':'' %>><%= lang==='am'?c[2]:c[1] %></option>
-      <% }) %>
-    </select>
-    <input type="number" name="min" placeholder="<%= t('minBudget') %>" value="<%= f.min || '' %>" style="width:110px;padding:9px 12px;border-radius:999px;border:1.5px solid var(--line)">
-    <input type="number" name="max" placeholder="<%= t('maxBudget') %>" value="<%= f.max || '' %>" style="width:110px;padding:9px 12px;border-radius:999px;border:1.5px solid var(--line)">
-    <button class="chip" type="submit">→</button>
+  <div class="filter-panel" id="filterPanel" <%= (f.city||f.min||f.max||f.sort!=='newest'||f.verified) ? '' : 'hidden' %>>
+    <div class="frow">
+      <label><%= t('city') %></label>
+      <select name="city">
+        <option value=""><%= t('all') %></option>
+        <% CITIES.forEach(function(c){ %>
+          <option value="<%= c[0] %>" <%= f.city===c[0]?'selected':'' %>><%= lang==='am'?c[2]:c[1] %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="frow frow-2">
+      <div>
+        <label><%= t('minBudget') %></label>
+        <input type="number" name="min" placeholder="0" value="<%= f.min || '' %>">
+      </div>
+      <div>
+        <label><%= t('maxBudget') %></label>
+        <input type="number" name="max" placeholder="∞" value="<%= f.max || '' %>">
+      </div>
+    </div>
+    <div class="frow">
+      <label><%= t('sortBy') %></label>
+      <select name="sort">
+        <option value="newest" <%= f.sort==='newest'?'selected':'' %>><%= t('newest') %></option>
+        <option value="budget_desc" <%= f.sort==='budget_desc'?'selected':'' %>><%= t('budgetHigh') %></option>
+        <option value="budget_asc" <%= f.sort==='budget_asc'?'selected':'' %>><%= t('budgetLow') %></option>
+        <option value="likes" <%= f.sort==='likes'?'selected':'' %>><%= t('mostLiked') %></option>
+      </select>
+    </div>
+    <label class="check"><input type="checkbox" name="verified" value="1" <%= f.verified?'checked':'' %>> <%= t('verifiedOnly') %></label>
+    <button class="btn btn-green" type="submit"><%= t('applyFilters') %></button>
   </div>
 </form>
+<script>
+document.getElementById('filterToggle').addEventListener('click', function(){
+  var p=document.getElementById('filterPanel');
+  p.hidden=!p.hidden;
+  this.classList.toggle('on', !p.hidden);
+});
+</script>
 
 <p class="count"><%= jobs.length %> <%= t('jobsFound') %></p>
 
