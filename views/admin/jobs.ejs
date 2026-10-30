@@ -1,12 +1,14 @@
 <h1 class="page-title"><%= t('allJobs') %></h1>
 <%- include('_tabs', { tab: 'jobs' }) %>
 <table class="data">
-  <tr><th><%= t('job') %></th><th><%= t('company') %></th><th><%= t('status') %></th></tr>
+  <thead><tr><th><%= t('job') %></th><th><%= t('company') %></th><th><%= t('status') %></th></tr></thead>
+  <tbody>
   <% jobs.forEach(function(j){ %>
     <tr>
-      <td><a href="/jobs/<%= j.id %>" style="color:var(--green);font-weight:700"><%= j.title %></a></td>
-      <td><%= j.company_name %></td>
-      <td><span class="pill <%= j.published?'ok':'warn' %>"><%= j.published ? t('published') : t('pending') %></span></td>
+      <td data-l="<%= t('job') %>"><a href="/jobs/<%= j.id %>" style="color:var(--green);font-weight:700"><%= j.title %></a></td>
+      <td data-l="<%= t('company') %>"><%= j.company_name %></td>
+      <td data-l="<%= t('status') %>"><span class="pill <%= j.published?'ok':'warn' %>"><%= j.published ? t('published') : t('pending') %></span></td>
     </tr>
   <% }) %>
+  </tbody>
 </table>

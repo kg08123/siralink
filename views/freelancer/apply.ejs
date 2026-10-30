@@ -13,7 +13,7 @@
       <div class="doc-row">
         <div class="doc-ico"><%- icon('file') %></div>
         <div class="grow"><b><%= d %></b><div class="hint"><%= t('pdfDocx') %></div></div>
-        <input type="file" name="documents" required style="max-width:130px">
+        <input type="file" name="documents" required>
       </div>
     <% }) %>
     <% if (!docs.length) { %><p class="sub">—</p><% } %>

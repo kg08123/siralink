@@ -6,8 +6,9 @@
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 html{font-size:16px}
+html,body{overflow-x:clip; max-width:100%}
 body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Ethiopic",sans-serif; background:var(--bg); color:var(--ink); line-height:1.45}
-.wrap{max-width:640px; margin:0 auto; padding:0 16px 96px}
+.wrap{max-width:640px; margin:0 auto; padding:0 16px 96px; min-width:0}
 /* Header */
 .topbar{position:sticky; top:0; z-index:50; background:var(--card); border-bottom:1px solid var(--line)}
 .topbar-in{max-width:640px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:10px}
@@ -46,7 +47,8 @@ body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans 
 .tag-online{background:#e3f5e9; color:var(--green)}
 .tag-offline{background:#eef0f2; color:#4b5563}
 .budget{margin-left:auto; color:var(--amber); font-weight:800; font-size:1rem}
-.stats-line{display:flex; align-items:center; gap:14px; font-size:.88rem; color:var(--ink); margin:8px 0 12px}
+.stats-line{display:flex; align-items:center; gap:14px; font-size:.88rem; color:var(--ink); margin:8px 0 12px; flex-wrap:wrap}
+.stats-line .stat{min-width:0}
 .stars{color:var(--amber); letter-spacing:1px}
 /* Forms */
 .field{margin-bottom:14px}
@@ -67,8 +69,9 @@ body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans 
 .toggle2 button.on{background:var(--green); color:#fff; border-color:var(--green)}
 .upload-zone{border:2px dashed var(--amber); border-radius:14px; padding:26px 16px; text-align:center; background:var(--amber-soft); cursor:pointer}
 .upload-zone input{display:none}
-.doc-row{display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px}
-.doc-row .grow{flex:1}
+.doc-row{display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px; flex-wrap:wrap; min-width:0}
+.doc-row .grow{flex:1; min-width:0}
+.doc-row input[type=file]{flex:1 1 100%; min-width:0; max-width:100%; font-size:.85rem}
 .pill{font-size:.72rem; font-weight:800; padding:4px 10px; border-radius:999px}
 .pill.ok{background:#e3f5e9; color:var(--green)}
 .pill.wait{background:#eef0f2; color:var(--muted)}
@@ -78,10 +81,10 @@ body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans 
 .detail-head{background:#fff; border-radius:16px; padding:16px; margin:14px 0}
 .co-head{display:flex; gap:12px; align-items:center}
 .co-avatar{width:56px; height:56px; border-radius:50%; background:var(--green); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:800; flex:0 0 auto}
-.stat3{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0}
-.stat3 .box{background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px; text-align:center}
+.stat3{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:12px 0}
+.stat3 .box{background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 8px; text-align:center; min-width:0}
 .stat3 .box b{font-size:1.25rem; display:block}
-.stat3 .box small{color:var(--muted)}
+.stat3 .box small{color:var(--muted); display:block; font-size:.78rem}
 .section{background:#fff; border-radius:16px; padding:16px; margin-bottom:12px}
 .section h2{margin:0 0 10px; font-size:1.1rem}
 .doc-need{display:flex; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line)}
@@ -114,7 +117,8 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .tabs a.on{background:var(--green); color:#fff; border-color:var(--green)}
 .stepbar{height:8px; background:#e8eb e8; background:#e8ebe8; border-radius:99px; margin:8px 0 16px; overflow:hidden}
 .stepbar i{display:block; height:100%; background:var(--green); border-radius:99px}
-.copy-row{display:flex; gap:8px; align-items:center; background:var(--green-soft); border-radius:12px; padding:12px 14px; font-weight:800; font-size:1.1rem; margin:10px 0}
+.copy-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; background:var(--green-soft); border-radius:12px; padding:12px 14px; font-weight:800; font-size:1.1rem; margin:10px 0}
+.copy-row span{min-width:0; overflow-wrap:anywhere}
 .footer{max-width:640px; margin:24px auto 0; padding:18px 16px 40px; color:var(--muted); font-size:.82rem; text-align:center}
 [dir=rtl]{text-align:right}
 
@@ -182,14 +186,18 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .bubble.mine small{color:#d7efe2}
 .bubble.theirs{align-self:flex-start;border-bottom-left-radius:4px}
 .chatbar{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 0 calc(10px + env(safe-area-inset-bottom));background:var(--bg)}
-.chatbar input{flex:1;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1rem;background:#fff}
+.chatbar input{flex:1;min-width:0;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1rem;background:#fff}
+.chatbar .icon-btn{flex:0 0 auto}
 
 /* Batch 3 additions */
 .avatar-lg{width:72px;height:72px;border-radius:20px;object-fit:cover;flex:0 0 auto}
 .avatar-ph{background:var(--green-soft);color:var(--green);display:flex;align-items:center;justify-content:center}
 .avatar-ph .ico{width:34px;height:34px}
 .avatar-sm{width:40px;height:40px;border-radius:12px;object-fit:cover}
-.detail-head{display:flex;gap:14px;align-items:center;margin:14px 0}
+/* Horizontal profile header (avatar + info side by side). NOTE: .detail-head stays a
+   vertical block card (job page, company pages) — do not make it flex again. */
+.profile-head{display:flex;gap:14px;align-items:center;margin:14px 0;min-width:0}
+.profile-head>div{min-width:0}
 .btn-google{background:#fff;border:1.5px solid var(--line);color:var(--ink);padding:13px 16px;font-size:1rem;width:100%;display:flex;align-items:center;justify-content:center;gap:10px}
 .g-logo{font-weight:900;font-size:1.25rem;color:#4285F4;font-family:system-ui}
 .or-row{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:.85rem}
@@ -199,3 +207,26 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .img-prev img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
 .chat-item.unread{border-color:var(--green);background:var(--green-soft)}
 .bubble p{margin:0 0 2px;word-break:break-word}
+
+/* --- Mobile hardening (360px) --- */
+/* Tables become stacked cards on narrow screens; cells carry data-l labels */
+@media (max-width:520px){
+  table.data thead{display:none}
+  table.data,table.data tbody,table.data tr,table.data td{display:block;width:100%}
+  table.data{background:none}
+  table.data tr{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;padding:2px 0}
+  table.data td{border-bottom:none;position:relative;padding:9px 12px 9px 44%;min-height:38px}
+  table.data td::before{content:attr(data-l);position:absolute;left:12px;top:9px;font-weight:700;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.4px;max-width:38%}
+  /* Two-column label/value tables (user detail) stay simple rows */
+  table.data.kv td{padding:9px 12px}
+  table.data.kv td::before{display:none}
+  table.data.kv tr{display:flex}
+  table.data.kv th{display:block;width:38%;flex:0 0 auto;padding:9px 0 9px 12px;background:none;border-bottom:none;font-size:.78rem}
+  table.data.kv td{width:62%;flex:1 1 auto}
+}
+@media (max-width:380px){
+  .logo{font-size:1.05rem}
+  .logo-mark{width:30px;height:30px;font-size:1rem}
+  .stat3{gap:8px}
+  .stat3 .box{padding:10px 6px}
+}

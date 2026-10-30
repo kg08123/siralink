@@ -4,9 +4,9 @@
 <% apps.forEach(function(a){ %>
   <div class="job-card">
     <h3><%= a.job_title %></h3>
-    <div class="co-line"><span><%= a.company_name %></span></div>
+    <div class="co-line"><span><a href="/admin/users/<%= a.company_user_id %>" style="color:var(--green);font-weight:700"><%= a.company_name %></a></span></div>
     <div class="meta-line">
-      <span><b><%= a.freelancer_name %></b> · <%= a.freelancer_phone %></span>
+      <span><b><a href="/admin/users/<%= a.freelancer_user_id %>" style="color:var(--green);font-weight:700"><%= a.freelancer_name %></a></b> · <%= a.freelancer_phone %></span>
       <span class="pill <%= a.status==='accepted'?'ok':(a.status==='rejected'?'bad':'wait') %>"><%= t(a.status) %></span>
     </div>
     <% if (a.proposal) { %><p><b><%= t('proposal') %>:</b> <%= a.proposal %></p><% } %>

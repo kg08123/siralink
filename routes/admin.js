@@ -47,7 +47,8 @@ router.post('/verifications/:id/:action', async (req, res, next) => {
 router.get('/payments', async (req, res, next) => {
   try {
     const r = await db.query(
-      `SELECT p.id, p.receipt_path, p.status, p.created_at, j.id AS job_id, j.title, c.company_name
+      `SELECT p.id, p.receipt_path, p.status, p.created_at, j.id AS job_id, j.title,
+              c.company_name, c.user_id AS company_user_id
        FROM payments p JOIN jobs j ON j.id=p.job_id JOIN companies c ON c.id=j.company_id
        WHERE p.status='pending' ORDER BY p.created_at DESC`);
     res.render('admin/payments', { title: res.locals.t('paymentReceipts'), payments: r.rows });
@@ -106,9 +107,9 @@ router.get('/users/:id', async (req, res, next) => {
 router.get('/applications', async (req, res, next) => {
   try {
     const r = await db.query(
-      `SELECT a.id, a.proposal, a.status, a.created_at,
+      `SELECT a.id, a.proposal, a.status, a.created_at, a.freelancer_user_id,
               u.name AS freelancer_name, u.phone AS freelancer_phone,
-              j.title AS job_title, c.company_name
+              j.title AS job_title, c.company_name, c.user_id AS company_user_id
        FROM applications a
        JOIN users u ON u.id = a.freelancer_user_id
        JOIN jobs j ON j.id = a.job_id

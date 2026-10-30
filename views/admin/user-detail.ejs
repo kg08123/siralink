@@ -2,7 +2,7 @@
 <%- include('_tabs', { tab: 'users' }) %>
 
 <div class="job-card">
-  <div class="detail-head">
+  <div class="profile-head">
     <% if (user.avatar_url) { %>
       <img class="avatar-lg" src="<%= user.avatar_url %>" alt="<%= user.name %>">
     <% } else { %>
@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <table class="data" style="margin-top:14px">
+  <table class="data kv" style="margin-top:14px">
     <tr><th><%= t('phone') %></th><td><%= user.phone %></td></tr>
     <tr><th><%= t('email') %></th><td><%= user.email || '—' %></td></tr>
     <tr><th><%= t('createdAt') %></th><td><%= new Date(user.created_at).toLocaleString() %></td></tr>
@@ -23,7 +23,7 @@
 
   <% if (user.role === 'freelancer' && profile) { %>
     <h3 style="margin-top:16px"><%= t('profile') %></h3>
-    <table class="data">
+     <table class="data kv">
       <tr><th><%= t('profession') %></th><td><%= profile.profession ? catName(profile.profession, lang) : '—' %></td></tr>
       <tr><th><%= t('skills') %></th><td><%= profile.skills || '—' %></td></tr>
       <tr><th><%= t('bio') %></th><td><%= profile.bio || '—' %></td></tr>
@@ -31,7 +31,7 @@
   <% } %>
   <% if (user.role === 'company' && profile) { %>
     <h3 style="margin-top:16px"><%= t('companyProfile') %></h3>
-    <table class="data">
+     <table class="data kv">
       <tr><th><%= t('companyName') %></th><td><%= profile.company_name %></td></tr>
       <tr><th><%= t('licenseNo') %></th><td><%= profile.license_no || '—' %></td></tr>
       <tr><th><%= t('tin') %></th><td><%= profile.tin || '—' %></td></tr>
