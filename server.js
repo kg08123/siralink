@@ -16,15 +16,21 @@ if (process.env.DATABASE_URL && !process.env.USE_PGMEM) {
   db.query(schema)
     .then(() => console.log('schema ensured'))
     .then(async () => {
-      if (process.env.SEED_DEMO !== '1') return;
-      const { rows } = await db.query('SELECT COUNT(*)::int AS n FROM users');
-      if (rows[0].n > 0) { console.log('seed skipped: users exist'); return; }
-      console.log('seeding demo data...');
-      await require('./db/seed').main({ keepAlive: true });
+      // One-time demo seed (only when users table is empty)
+      if (process.env.SEED_DEMO === '1') {
+        const { rows } = await db.query('SELECT COUNT(*)::int AS n FROM users');
+        if (rows[0].n === 0) {
+          console.log('seeding demo data...');
+          await require('./db/seed').main({ keepAlive: true });
+        } else {
+          console.log('seed skipped: users exist');
+        }
+      }
+      // Admin password rotation (independent of seeding)
       if (process.env.ADMIN_PASSWORD) {
         const bcrypt = require('bcryptjs');
         const h = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
-        await db.query("UPDATE users SET password_hash=$1 WHERE role='admin'");
+        await db.query("UPDATE users SET password_hash=$1 WHERE role='admin'", [h]);
         console.log('admin password rotated');
       }
     })
