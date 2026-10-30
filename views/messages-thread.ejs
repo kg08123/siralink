@@ -5,7 +5,7 @@
     <div class="bubble <%= m.sender_user_id===user.id?'mine':'theirs' %>"><p><%= m.body %></p><small><%= new Date(m.created_at).toLocaleString() %></small></div>
   <% }) %>
 </div>
-<form method="post" action="/messages/<%= conv.id %>" class="chatbar">
+<form id="sendform" method="post" action="/messages/<%= conv.id %>" class="chatbar">
   <input type="text" name="body" placeholder="<%= t('typeMessage') %>" required autocomplete="off" maxlength="2000">
   <button class="icon-btn" type="submit" aria-label="<%= t('send') %>"><%- icon('send') %></button>
 </form>
@@ -14,22 +14,35 @@
   var chat=document.getElementById('chat');
   var lastId=<%= messages.length ? messages[messages.length-1].id : 0 %>;
   chat.scrollTop=chat.scrollHeight;
-  setInterval(async function(){
+  function addMsg(m){
+    if(m.id<=lastId) return;
+    lastId=m.id;
+    var div=document.createElement('div');
+    div.className='bubble '+(m.mine?'mine':'theirs');
+    var p=document.createElement('p'); p.textContent=m.body;
+    var s=document.createElement('small'); s.textContent=new Date(m.created_at).toLocaleString();
+    div.appendChild(p); div.appendChild(s); chat.appendChild(div);
+    chat.scrollTop=chat.scrollHeight;
+  }
+  async function poll(){
     try{
-      var r=await fetch('/messages/<%= conv.id %>/json?after='+lastId,{headers:{'Accept':'application/json'}});
+      var r=await fetch('/messages/<%= conv.id %>/json?after='+lastId,{headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'}});
       if(!r.ok) return;
       var d=await r.json();
-      d.messages.forEach(function(m){
-        if(m.id<=lastId) return;
-        lastId=m.id;
-        var div=document.createElement('div');
-        div.className='bubble '+(m.mine?'mine':'theirs');
-        var p=document.createElement('p'); p.textContent=m.body;
-        var s=document.createElement('small'); s.textContent=new Date(m.created_at).toLocaleString();
-        div.appendChild(p); div.appendChild(s); chat.appendChild(div);
-      });
-      if(d.messages.length) chat.scrollTop=chat.scrollHeight;
+      d.messages.forEach(addMsg);
     }catch(e){}
-  },5000);
+  }
+  setInterval(poll,5000);
+  var form=document.getElementById('sendform');
+  var input=form.querySelector('input[name=body]');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var text=input.value.trim();
+    if(!text) return;
+    input.value='';
+    fetch(form.action,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','X-Requested-With':'XMLHttpRequest'},body:'body='+encodeURIComponent(text)})
+      .then(function(r){ if(r.ok) poll(); else form.submit(); })
+      .catch(function(){ form.submit(); });
+  });
 })();
 </script>

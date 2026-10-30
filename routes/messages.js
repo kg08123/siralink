@@ -81,6 +81,7 @@ router.get('/:id/json', requireAuth, async (req, res, next) => {
   try {
     const conv = await getConv(req.params.id, req.user.id);
     if (!conv) return res.status(404).json({ error: 'not found' });
+    if (!req.xhr) return res.redirect('/messages/' + conv.id);
     const after = Number(req.query.after) || 0;
     const m = await db.query(
       `SELECT m.id, m.body, m.created_at, m.sender_user_id
@@ -105,7 +106,7 @@ router.post('/:id', requireAuth, async (req, res, next) => {
     await db.query(
       'INSERT INTO messages(conversation_id, sender_user_id, body) VALUES($1,$2,$3)',
       [conv.id, req.user.id, body.slice(0, 2000)]);
-    if (req.accepts('json')) return res.json({ ok: true });
+    if (req.xhr) return res.json({ ok: true });
     res.redirect('/messages/' + conv.id);
   } catch (e) { next(e); }
 });
