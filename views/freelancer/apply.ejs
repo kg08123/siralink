@@ -1,0 +1,23 @@
+<h1 class="page-title"><%= t('applyNow') %></h1>
+<p class="sub"><%= job.title %> · <%= job.company_name %>
+  <% if (job.verified) { %><span class="badge-verified">✓ <%= t('verified') %></span><% } %></p>
+
+<form method="post" action="/f/apply/<%= job.id %>" enctype="multipart/form-data">
+  <div class="field">
+    <label><%= t('yourProposal') %></label>
+    <textarea name="proposal" placeholder="<%= t('proposalPh') %>"></textarea>
+  </div>
+  <div class="field">
+    <label><%= t('requiredDocs') %></label>
+    <% docs.forEach(function(d, i){ %>
+      <div class="doc-row">
+        <div class="doc-ico">📄</div>
+        <div class="grow"><b><%= d %></b><div class="hint"><%= t('pdfDocx') %></div></div>
+        <input type="file" name="documents" required style="max-width:130px">
+      </div>
+    <% }) %>
+    <% if (!docs.length) { %><p class="sub">—</p><% } %>
+    <p class="hint"><%= t('linkOrFile') %></p>
+  </div>
+  <button class="btn btn-green" type="submit"><%= t('submitApplication') %></button>
+</form>

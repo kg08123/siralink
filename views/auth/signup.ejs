@@ -1,0 +1,64 @@
+<h1 class="page-title" style="text-align:center"><%= t('joinTitle') %></h1>
+<p class="sub" style="text-align:center"><%= t('appTag') %></p>
+
+<form method="post" action="/signup" id="signupForm">
+  <div class="field">
+    <label><%= t('iAmA') %></label>
+    <div class="role-cards">
+      <label class="role-card sel" id="card-freelancer">
+        <input type="radio" name="role" value="freelancer" checked>
+        <div><b>💼 <%= t('freelancer') %> — <%= t('findJobs') %></b><small><%= t('signupFreelancerDesc') %></small></div>
+      </label>
+      <label class="role-card" id="card-company">
+        <input type="radio" name="role" value="company">
+        <div><b>🏢 <%= t('company') %> — <%= t('hireTalent') %></b><small><%= t('signupCompanyDesc') %></small></div>
+      </label>
+    </div>
+  </div>
+
+  <h3><%= t('accountDetails') %></h3>
+  <div class="field" id="nameField">
+    <label><%= t('fullName') %> *</label>
+    <input type="text" name="name" required>
+  </div>
+  <div class="field role-extra" id="extra-company">
+    <label><%= t('companyName') %> *</label>
+    <input type="text" name="company_name">
+    <label style="margin-top:12px"><%= t('licenseNo') %></label>
+    <input type="text" name="license_no" placeholder="ET-000000">
+    <label style="margin-top:12px"><%= t('tin') %></label>
+    <input type="text" name="tin" placeholder="0000000000">
+  </div>
+  <div class="field role-extra show" id="extra-freelancer">
+    <label><%= t('whatDoYouDo') %> *</label>
+    <select name="profession">
+      <% CATEGORIES.forEach(function(c){ %><option value="<%= c[0] %>"><%= lang==='am'?c[2]:c[1] %></option><% }) %>
+    </select>
+    <label style="margin-top:12px"><%= t('skills') %></label>
+    <input type="text" name="skills" placeholder="Photoshop, Figma">
+  </div>
+  <div class="field">
+    <label><%= t('phone') %> *</label>
+    <input type="text" name="phone" placeholder="+251 9XX XXX XXX" required>
+  </div>
+  <div class="field">
+    <label><%= t('password') %> *</label>
+    <input type="password" name="password" required minlength="4">
+  </div>
+  <p class="sub" style="font-size:.8rem"><%= t('termsAgree') %></p>
+  <button class="btn btn-green" type="submit"><%= t('continue') %></button>
+</form>
+
+<script>
+const radios = document.querySelectorAll('input[name=role]');
+function syncRole(){
+  const role = document.querySelector('input[name=role]:checked').value;
+  document.getElementById('card-freelancer').classList.toggle('sel', role==='freelancer');
+  document.getElementById('card-company').classList.toggle('sel', role==='company');
+  document.getElementById('extra-freelancer').classList.toggle('show', role==='freelancer');
+  document.getElementById('extra-company').classList.toggle('show', role==='company');
+  document.querySelector('#nameField label').textContent = role==='company' ? "<%= t('fullName') %> *" : "<%= t('fullName') %> *";
+  document.querySelector('#extra-company input[name=company_name]').required = (role==='company');
+}
+radios.forEach(r=>r.addEventListener('change',syncRole)); syncRole();
+</script>

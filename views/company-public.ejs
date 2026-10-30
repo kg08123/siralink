@@ -1,0 +1,28 @@
+<div class="detail-head">
+  <div class="co-head">
+    <div class="co-avatar"><%= company.company_name.charAt(0).toUpperCase() %></div>
+    <div>
+      <div style="font-weight:800;font-size:1.15rem"><%= company.company_name %>
+        <% if (company.verified) { %> <span class="badge-verified">✓ <%= t('verified') %></span><% } %></div>
+      <div><span class="stars"><%= stars(company.rating_avg) %></span> <b><%= Number(company.rating_avg).toFixed(1) %></b>
+        <span style="color:var(--muted)">(<%= company.rating_count %> <%= t('reviews') %>)</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2><%= t('jobs') %> (<%= jobs.length %>)</h2>
+  <% jobs.forEach(function(j){ %><%- include('partials/jobcard', { j }) %><% }) %>
+  <% if (!jobs.length) { %><p class="sub">—</p><% } %>
+</div>
+
+<div class="section">
+  <h2><%= t('comments') %></h2>
+  <% reviews.forEach(function(r){ %>
+    <div class="review">
+      <div class="who"><%= r.reviewer_name %> <span class="stars"><%= stars(r.stars) %></span></div>
+      <p class="cm"><%= r.comment %></p>
+    </div>
+  <% }) %>
+  <% if (!reviews.length) { %><p class="sub">—</p><% } %>
+</div>

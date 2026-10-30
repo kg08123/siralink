@@ -1,0 +1,23 @@
+<h1 class="page-title"><%= t('dashboard') %></h1>
+<p class="sub"><%= user.name %> · <%= catName(profile.profession, lang) %></p>
+
+<div class="stat4">
+  <div class="box"><b><%= counts.total %></b><small><%= t('myApplications') %></small></div>
+  <div class="box"><b><%= counts.pending %></b><small><%= t('pending') %></small></div>
+</div>
+
+<div class="tabs">
+  <a href="/f/applications"><%= t('myApplications') %></a>
+  <a href="/f/profile"><%= t('profile') %></a>
+  <a href="/"><%= t('findJobs') %></a>
+</div>
+
+<h3><%= t('myApplications') %></h3>
+<% if (!apps.length) { %><div class="empty"><%= t('noApplications') %></div><% } %>
+<% apps.forEach(function(a){ %>
+  <div class="job-card">
+    <h3><%= a.title %></h3>
+    <div class="co-line"><span><%= a.company_name %></span></div>
+    <span class="pill <%= a.status==='accepted'?'ok':(a.status==='rejected'?'bad':'wait') %>"><%= t(a.status) %></span>
+  </div>
+<% }) %>

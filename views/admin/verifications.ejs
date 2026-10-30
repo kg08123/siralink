@@ -1,0 +1,14 @@
+<h1 class="page-title"><%= t('pendingCompanies') %></h1>
+<%- include('_tabs', { tab: 'verif' }) %>
+<% if (!companies.length) { %><div class="empty">—</div><% } %>
+<% companies.forEach(function(c){ %>
+  <div class="job-card">
+    <h3><%= c.company_name %></h3>
+    <div class="co-line"><span><%= t('licenseNo') %>: <%= c.license_no || '—' %> · TIN: <%= c.tin || '—' %></span></div>
+    <div class="meta-line"><span><%= t('name') %>: <%= c.contact_name %> · <%= c.contact_phone %></span></div>
+    <div class="row-actions">
+      <form method="post" action="/admin/verifications/<%= c.id %>/approve"><button class="btn btn-green btn-sm" type="submit">✓ <%= t('approve') %></button></form>
+      <form method="post" action="/admin/verifications/<%= c.id %>/reject"><button class="btn btn-red btn-sm" type="submit">✕ <%= t('reject') %></button></form>
+    </div>
+  </div>
+<% }) %>

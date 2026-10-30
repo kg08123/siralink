@@ -1,0 +1,10 @@
+<h1 class="page-title"><%= t('myApplications') %></h1>
+<% if (!apps.length) { %><div class="empty"><%= t('noApplications') %></div><% } %>
+<% apps.forEach(function(a){ %>
+  <div class="job-card">
+    <h3><a href="/jobs/<%= a.job_id %>" style="color:inherit;text-decoration:none"><%= a.title %></a></h3>
+    <div class="co-line"><span><%= a.company_name %></span></div>
+    <div class="meta-line"><span class="pill <%= a.status==='accepted'?'ok':(a.status==='rejected'?'bad':'wait') %>"><%= t(a.status) %></span></div>
+    <% if (a.proposal) { %><p class="sub" style="margin:6px 0 0">“<%= a.proposal %>”</p><% } %>
+  </div>
+<% }) %>

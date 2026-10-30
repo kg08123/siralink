@@ -1,0 +1,18 @@
+<h1 class="page-title"><%= t('myJobs') %></h1>
+<a class="btn btn-green" href="/c/post" style="margin-bottom:12px"><%= t('postJob') %></a>
+<% if (!jobs.length) { %><div class="empty"><%= t('myJobsEmpty') %></div><% } %>
+<% jobs.forEach(function(j){ %>
+  <div class="job-card">
+    <h3><%= j.title %></h3>
+    <div class="meta-line">
+      <span class="tag <%= j.work_type==='online'?'tag-online':'tag-offline' %>"><%= t(j.work_type) %></span>
+      <span><%= fmtETB(j.budget_etb) %></span>
+      <span>👥 <%= j.applied_count %></span>
+    </div>
+    <div class="meta-line">
+      <span class="pill <%= j.published?'ok':'warn' %>"><%= j.published ? t('published') : t('awaitingPayment') %></span>
+      <% if (j.pay_status) { %><span class="pill <%= j.pay_status==='approved'?'ok':(j.pay_status==='rejected'?'bad':'warn') %>"><%= t('payment') %>: <%= t(j.pay_status) %></span><% } %>
+    </div>
+    <a class="btn btn-outline btn-sm" href="/c/jobs/<%= j.id %>/applicants"><%= t('viewApplicants') %> (<%= j.applied_count %>)</a>
+  </div>
+<% }) %>

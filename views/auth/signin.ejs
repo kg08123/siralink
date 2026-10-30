@@ -1,0 +1,16 @@
+<h1 class="page-title" style="text-align:center"><%= t('welcomeBack') %></h1>
+<p class="sub" style="text-align:center"><%= t('appTag') %></p>
+
+<form method="post" action="/signin">
+  <div class="field">
+    <label><%= t('phone') %></label>
+    <input type="text" name="phone" placeholder="+251 9XX XXX XXX" required>
+  </div>
+  <div class="field">
+    <label><%= t('password') %></label>
+    <input type="password" name="password" required>
+  </div>
+  <button class="btn btn-green" type="submit"><%= t('signIn') %></button>
+</form>
+<p class="sub" style="text-align:center;margin-top:14px"><%= t('newHere') %> <a href="/signup" style="color:var(--green);font-weight:700"><%= t('createAccount') %></a></p>
+<p class="sub" style="text-align:center;font-size:.8rem"><%= t('adminLoginNote') %></p>

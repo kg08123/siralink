@@ -1,0 +1,74 @@
+<div class="detail-head">
+  <div class="co-head">
+    <div class="co-avatar"><%= job.company_name.charAt(0).toUpperCase() %></div>
+    <div>
+      <div style="font-weight:800;font-size:1.1rem">
+        <a href="/companies/<%= job.company_id %>" style="color:inherit;text-decoration:none"><%= job.company_name %></a>
+        <% if (job.verified) { %> <span class="badge-verified">✓ <%= t('verified') %></span><% } %>
+      </div>
+      <div><span class="stars"><%= stars(job.rating_avg) %></span> <b><%= Number(job.rating_avg).toFixed(1) %></b> <span style="color:var(--muted)">(<%= job.rating_count %> <%= t('reviews') %>)</span></div>
+    </div>
+  </div>
+  <h1 class="page-title" style="margin-top:10px"><%= job.title %></h1>
+  <div class="meta-line">
+    <span class="tag <%= job.work_type==='online'?'tag-online':'tag-offline' %>">● <%= t(job.work_type) %></span>
+    <span>📍 <%= cityName(job.city, lang) %></span>
+    <span class="budget">💰 <%= fmtETB(job.budget_etb) %></span>
+  </div>
+  <div class="stat3">
+    <div class="box"><span style="font-size:1.3rem">⭐</span><b><%= Number(job.rating_avg).toFixed(1) %></b><small><%= t('rating') %></small></div>
+    <div class="box"><span style="font-size:1.3rem">💬</span><b><%= job.comment_count %></b><small><%= t('comments') %></small></div>
+    <div class="box"><span style="font-size:1.3rem">👥</span><b><%= job.applied_count %></b><small><%= t('applied') %></small></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2><%= t('jobDescription') %></h2>
+  <p style="white-space:pre-wrap;margin:0"><%= job.description %></p>
+</div>
+
+<div class="section">
+  <h2><%= t('documentsNeeded') %></h2>
+  <% (job.required_docs ? job.required_docs.split(',').map(s=>s.trim()).filter(Boolean) : []).forEach(function(d){ %>
+    <div class="doc-need">
+      <div class="doc-ico">📄</div>
+      <div><b><%= d %></b></div>
+    </div>
+  <% }) %>
+</div>
+
+<div class="section">
+  <h2><%= t('comments') %></h2>
+  <% if (!reviews.length) { %><p class="sub">—</p><% } %>
+  <% reviews.forEach(function(r){ %>
+    <div class="review">
+      <div class="who"><%= r.reviewer_name %> <span class="stars"><%= stars(r.stars) %></span></div>
+      <p class="cm"><%= r.comment %></p>
+    </div>
+  <% }) %>
+  <% if (user && user.role === 'freelancer') { %>
+    <form method="post" action="/jobs/<%= job.id %>/review" style="margin-top:12px">
+      <div class="field">
+        <label><%= t('leaveReview') %></label>
+        <select name="stars" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--line);margin-bottom:8px">
+          <option value="5">★★★★★ (5)</option><option value="4">★★★★ (4)</option>
+          <option value="3">★★★ (3)</option><option value="2">★★ (2)</option><option value="1">★ (1)</option>
+        </select>
+        <textarea name="comment" placeholder="<%= t('yourComment') %>"></textarea>
+      </div>
+      <button class="btn btn-green" type="submit"><%= t('postReview') %></button>
+    </form>
+  <% } else if (!user) { %>
+    <p class="sub"><%= t('signInToReview') %></p>
+  <% } %>
+</div>
+
+<div class="sticky-bottom"><div class="wrap">
+  <% if (applied) { %>
+    <div class="flash ok" style="margin:0">✓ <%= t('alreadyApplied') %></div>
+  <% } else if (user && user.role === 'freelancer') { %>
+    <a class="btn btn-green" href="/f/apply/<%= job.id %>"><%= t('applyNow') %></a>
+  <% } else if (!user) { %>
+    <a class="btn btn-green" href="/signin"><%= t('signInToApply') %></a>
+  <% } %>
+</div></div>

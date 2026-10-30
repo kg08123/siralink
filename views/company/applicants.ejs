@@ -1,0 +1,26 @@
+<h1 class="page-title"><%= t('applicants') %></h1>
+<p class="sub"><%= job.title %></p>
+<% if (!apps.length) { %><div class="empty"><%= t('noApplicants') %></div><% } %>
+<% apps.forEach(function(a){ %>
+  <div class="job-card">
+    <h3><%= a.freelancer_name %></h3>
+    <div class="co-line"><span><%= a.profession ? catName(a.profession, lang) : '' %><%= a.skills ? ' · ' + a.skills : '' %></span></div>
+    <% if (a.proposal) { %><p><b><%= t('proposal') %>:</b> <%= a.proposal %></p><% } %>
+    <div class="field" style="margin-top:8px"><label><%= t('viewDocs') %></label>
+      <% (docs[a.id]||[]).forEach(function(d){ %>
+        <div class="doc-row">
+          <div class="doc-ico">📄</div>
+          <div class="grow"><b><%= d.doc_name %></b></div>
+          <% if (d.file_path) { %><a class="btn btn-amber btn-sm" href="<%= d.file_path %>" target="_blank"><%= t('uploaded') %></a><% } else { %><span class="pill wait">—</span><% } %>
+        </div>
+      <% }) %>
+    </div>
+    <div class="meta-line"><span class="pill <%= a.status==='accepted'?'ok':(a.status==='rejected'?'bad':'wait') %>"><%= t(a.status) %></span></div>
+    <% if (a.status === 'pending') { %>
+      <div class="row-actions">
+        <form method="post" action="/c/applications/<%= a.id %>/status"><input type="hidden" name="status" value="accepted"><button class="btn btn-green btn-sm" type="submit">✓ <%= t('markAccepted') %></button></form>
+        <form method="post" action="/c/applications/<%= a.id %>/status"><input type="hidden" name="status" value="rejected"><button class="btn btn-red btn-sm" type="submit">✕ <%= t('markRejected') %></button></form>
+      </div>
+    <% } %>
+  </div>
+<% }) %>

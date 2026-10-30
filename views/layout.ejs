@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SiraLink — <%= typeof title !== 'undefined' ? title : t('appTag') %></title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="logo" href="/"><span class="logo-mark">S</span>SiraLink</a>
+    <nav class="navlinks">
+      <% if (user) { %>
+        <% if (user.role === 'freelancer') { %>
+          <a href="/f/dashboard"><%= t('dashboard') %></a>
+          <a href="/f/applications"><%= t('myApplications') %></a>
+        <% } else if (user.role === 'company') { %>
+          <a href="/c/dashboard"><%= t('dashboard') %></a>
+          <a href="/c/jobs"><%= t('myJobs') %></a>
+        <% } else if (user.role === 'admin') { %>
+          <a href="/admin"><%= t('adminPanel') %></a>
+        <% } %>
+        <a href="/signout"><%= t('signOut') %></a>
+      <% } else { %>
+        <a href="/signin"><%= t('signIn') %></a>
+      <% } %>
+      <span class="lang-toggle">
+        <a href="?lang=en" class="<%= lang==='en'?'on':'' %>">EN</a><a href="?lang=am" class="<%= lang==='am'?'on':'' %>">አማ</a>
+      </span>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  <% if (flash) { %><div class="flash <%= flash.type %>"><%= flash.msg %></div><% } %>
+  <%- body %>
+</main>
+<footer class="footer">SiraLink · <%= t('appTag') %> · Addis Ababa, Ethiopia</footer>
+<script>
+function copyNum(id){const el=document.getElementById(id);if(!el)return;navigator.clipboard&&navigator.clipboard.writeText(el.innerText.trim());}
+</script>
+</body>
+</html>

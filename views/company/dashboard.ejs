@@ -1,0 +1,27 @@
+<h1 class="page-title"><%= t('dashboard') %></h1>
+<div class="detail-head">
+  <div class="co-head">
+    <div class="co-avatar"><%= company.company_name.charAt(0).toUpperCase() %></div>
+    <div>
+      <div style="font-weight:800;font-size:1.1rem"><%= company.company_name %>
+        <% if (company.verified) { %><span class="badge-verified">✓ <%= t('verified') %></span><% } %></div>
+      <div><span class="pill <%= company.verification_status==='approved'?'ok':(company.verification_status==='rejected'?'bad':'warn') %>"><%= t(company.verification_status) %></span></div>
+    </div>
+  </div>
+  <% if (company.verification_status !== 'approved') { %>
+    <p class="sub" style="margin:10px 0 0">⏳ <%= t('unverifiedNote') %></p>
+  <% } %>
+</div>
+
+<div class="stat4">
+  <div class="box"><b><%= jobStats.total %></b><small><%= t('myJobs') %></small></div>
+  <div class="box"><b><%= jobStats.live %></b><small><%= t('published') %></small></div>
+  <div class="box"><b><%= appCount %></b><small><%= t('applicants') %></small></div>
+  <div class="box"><b><%= Number(company.rating_avg).toFixed(1) %> ⭐</b><small><%= company.rating_count %> <%= t('reviews') %></small></div>
+</div>
+
+<a class="btn btn-green" href="/c/post"><%= t('postJob') %></a>
+<div class="tabs" style="margin-top:12px">
+  <a href="/c/jobs"><%= t('myJobs') %></a>
+  <a href="/companies/<%= company.id %>"><%= t('companyProfile') %></a>
+</div>

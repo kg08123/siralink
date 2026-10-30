@@ -1,0 +1,20 @@
+<h1 class="page-title"><%= t('profile') %></h1>
+<form method="post" action="/f/profile">
+  <div class="field">
+    <label><%= t('profession') %></label>
+    <select name="profession">
+      <% CATEGORIES.forEach(function(c){ %>
+        <option value="<%= c[0] %>" <%= profile.profession===c[0]?'selected':'' %>><%= lang==='am'?c[2]:c[1] %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field">
+    <label><%= t('skills') %></label>
+    <input type="text" name="skills" value="<%= profile.skills || '' %>">
+  </div>
+  <div class="field">
+    <label><%= t('bio') %></label>
+    <textarea name="bio"><%= profile.bio || '' %></textarea>
+  </div>
+  <button class="btn btn-green" type="submit"><%= t('save') %></button>
+</form>

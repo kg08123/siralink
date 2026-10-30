@@ -1,0 +1,37 @@
+<form method="get" action="/">
+  <div class="searchbar">
+    <input type="text" name="q" placeholder="<%= t('searchJobs') %>" value="<%= f.q || '' %>">
+    <button class="icon-btn" type="submit" aria-label="search">⚙</button>
+  </div>
+  <div class="chips">
+    <a class="chip <%= !f.work_type ? 'on' : '' %>" href="?<%= qs({work_type:''}) %>"><%= t('all') %></a>
+    <a class="chip <%= f.work_type==='online' ? 'on' : '' %>" href="?<%= qs({work_type:'online'}) %>"><%= t('online') %></a>
+    <a class="chip <%= f.work_type==='offline' ? 'on' : '' %>" href="?<%= qs({work_type:'offline'}) %>"><%= t('offline') %></a>
+    <% CATEGORIES.forEach(function(c){ %>
+      <a class="chip <%= f.category===c[0] ? 'on' : '' %>" href="?<%= qs({category:c[0]}) %>"><%= lang==='am'?c[2]:c[1] %></a>
+    <% }) %>
+  </div>
+  <div class="chips">
+    <select name="city" onchange="this.form.submit()" style="padding:9px 12px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-weight:600">
+      <option value=""><%= t('city') %>: <%= t('all') %></option>
+      <% CITIES.forEach(function(c){ %>
+        <option value="<%= c[0] %>" <%= f.city===c[0]?'selected':'' %>><%= lang==='am'?c[2]:c[1] %></option>
+      <% }) %>
+    </select>
+    <input type="number" name="min" placeholder="<%= t('minBudget') %>" value="<%= f.min || '' %>" style="width:110px;padding:9px 12px;border-radius:999px;border:1.5px solid var(--line)">
+    <input type="number" name="max" placeholder="<%= t('maxBudget') %>" value="<%= f.max || '' %>" style="width:110px;padding:9px 12px;border-radius:999px;border:1.5px solid var(--line)">
+    <button class="chip" type="submit">→</button>
+  </div>
+</form>
+
+<p class="count"><%= jobs.length %> <%= t('jobsFound') %></p>
+
+<% if (!jobs.length) { %>
+  <div class="empty"><%= t('noJobs') %></div>
+<% } %>
+<% jobs.forEach(function(j){ %>
+  <%- include('partials/jobcard', { j }) %>
+<% }) %>
+<% if (!user) { %>
+  <a class="btn btn-outline" href="/signup" style="margin-top:8px"><%= t('newHere') %> <%= t('createAccount') %></a>
+<% } %>

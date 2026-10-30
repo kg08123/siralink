@@ -1,0 +1,69 @@
+<h1 class="page-title"><%= t('postJob') %></h1>
+<p class="sub"><%= t('step1') %></p>
+<div class="stepbar"><i style="width:50%"></i></div>
+
+<form method="post" action="/c/post" id="postForm">
+  <div class="field">
+    <label><%= t('jobTitle') %> *</label>
+    <input type="text" name="title" required placeholder="e.g. Graphic Designer for Brand Identity">
+  </div>
+  <div class="field">
+    <label><%= t('category') %> *</label>
+    <select name="category" required>
+      <% CATEGORIES.forEach(function(c){ %><option value="<%= c[0] %>"><%= lang==='am'?c[2]:c[1] %></option><% }) %>
+    </select>
+  </div>
+  <div class="field">
+    <label><%= t('workType') %></label>
+    <div class="toggle2">
+      <button type="button" id="wt-online" onclick="setWT('online')">🌐 <%= t('online') %></button>
+      <button type="button" id="wt-offline" class="on" onclick="setWT('offline')">📍 <%= t('offline') %></button>
+    </div>
+    <input type="hidden" name="work_type" id="work_type" value="offline">
+  </div>
+  <div class="field">
+    <label><%= t('location') %></label>
+    <select name="city">
+      <% CITIES.forEach(function(c){ %><option value="<%= c[0] %>"><%= lang==='am'?c[2]:c[1] %></option><% }) %>
+    </select>
+  </div>
+  <div class="field">
+    <label><%= t('budgetETB') %></label>
+    <input type="number" name="budget_etb" min="0" placeholder="5000">
+  </div>
+  <div class="field">
+    <label><%= t('jobDescription') %></label>
+    <textarea name="description" placeholder="..."></textarea>
+  </div>
+  <div class="field">
+    <label><%= t('docsFromApplicants') %></label>
+    <div id="docList"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input type="text" id="docInput" placeholder="CV" style="flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--line)">
+      <button type="button" class="btn btn-amber btn-sm" onclick="addDoc()">+ <%= t('addDocument') %></button>
+    </div>
+  </div>
+  <button class="btn btn-green" type="submit"><%= t('continueToPayment') %></button>
+</form>
+
+<script>
+function setWT(v){
+  document.getElementById('work_type').value = v;
+  document.getElementById('wt-online').classList.toggle('on', v==='online');
+  document.getElementById('wt-offline').classList.toggle('on', v==='offline');
+}
+function addDoc(){
+  const inp = document.getElementById('docInput');
+  const v = inp.value.trim(); if(!v) return;
+  const list = document.getElementById('docList');
+  const row = document.createElement('div');
+  row.className = 'doc-row';
+  row.innerHTML = '<div class="doc-ico">📄</div><div class="grow"><b></b><input type="hidden" name="docs" value=""></div><button type="button" class="btn btn-red btn-sm">✕</button>';
+  row.querySelector('b').textContent = v;
+  row.querySelector('input[type=hidden]').value = v;
+  row.querySelector('button').onclick = () => row.remove();
+  list.appendChild(row);
+  inp.value = '';
+}
+addDoc.call({}); document.getElementById('docInput').value='CV'; addDoc();
+</script>

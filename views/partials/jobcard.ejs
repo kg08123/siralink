@@ -1,0 +1,18 @@
+<a class="job-card" href="/jobs/<%= j.id %>">
+  <h3><%= j.title %></h3>
+  <div class="co-line">
+    <span><%= j.company_name %></span>
+    <% if (j.verified) { %><span class="badge-verified">✓ <%= t('verified') %></span><% } %>
+  </div>
+  <div class="meta-line">
+    <span><%= cityName(j.city, lang) %></span>·
+    <span class="tag <%= j.work_type === 'online' ? 'tag-online' : 'tag-offline' %>"><%= t(j.work_type) %></span>
+    <span class="budget"><%= fmtETB(j.budget_etb) %></span>
+  </div>
+  <div class="stats-line">
+    <span class="stars"><%= stars(j.rating_avg) %></span><b><%= Number(j.rating_avg).toFixed(1) %></b>
+    <span>💬 <%= j.comment_count %></span>
+    <span>👥 <%= j.applied_count %> <%= t('applied') %></span>
+  </div>
+  <span class="btn btn-green"><%= t('applyNow') %></span>
+</a>

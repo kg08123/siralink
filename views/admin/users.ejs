@@ -1,0 +1,8 @@
+<h1 class="page-title"><%= t('allUsers') %></h1>
+<%- include('_tabs', { tab: 'users' }) %>
+<table class="data">
+  <tr><th><%= t('name') %></th><th><%= t('phone') %></th><th><%= t('role') %></th></tr>
+  <% users.forEach(function(u){ %>
+    <tr><td><%= u.name %></td><td><%= u.phone %></td><td><span class="pill <%= u.role==='admin'?'bad':(u.role==='company'?'warn':'ok') %>"><%= u.role %></span></td></tr>
+  <% }) %>
+</table>
