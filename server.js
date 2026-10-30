@@ -9,6 +9,15 @@ const { t, CATEGORIES, CITIES, catName, cityName } = require('./i18n');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Auto-apply schema on production boot (Render + Neon). Idempotent (IF NOT EXISTS).
+if (process.env.DATABASE_URL && !process.env.USE_PGMEM) {
+  const fs = require('fs');
+  const schema = fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8');
+  db.query(schema)
+    .then(() => console.log('schema ensured'))
+    .catch((e) => console.error('auto-migrate failed:', e.message));
+}
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
