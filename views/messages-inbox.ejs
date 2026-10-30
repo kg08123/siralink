@@ -1,4 +1,18 @@
 <h1 class="page-title"><%= t('messages') %></h1>
+
+<h2 class="section-title"><%= t('platformTitle') %></h2>
+<% if (!notifs.length) { %><div class="empty"><%= t('noNotifications') %></div><% } %>
+<% notifs.forEach(function(n){ %>
+  <a class="chat-item <%= n.is_read ? '' : 'unread' %>" href="<%= n.link || '/messages' %>">
+    <div class="grow">
+      <div class="ci-top"><b><%= nt(n.title) %></b><% if (!n.is_read) { %><span class="badge">•</span><% } %></div>
+      <div class="sub"><%= nt(n.body) %></div>
+      <div class="ci-prev"><%= new Date(n.created_at).toLocaleString() %></div>
+    </div>
+  </a>
+<% }) %>
+
+<h2 class="section-title"><%= t('chatsTitle') %></h2>
 <% if (!convs.length) { %><div class="empty"><%= t('noConversations') %></div><% } %>
 <% convs.forEach(function(c){ %>
   <div class="chat-item">

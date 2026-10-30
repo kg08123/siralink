@@ -189,15 +189,8 @@ router.get('/companies/:id', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Notifications inbox (marks read on view)
-router.get('/notifications', requireAuth, async (req, res, next) => {
-  try {
-    const r = await db.query(
-      'SELECT * FROM notifications WHERE user_id=$1 ORDER BY created_at DESC LIMIT 100', [req.user.id]);
-    await db.query('UPDATE notifications SET is_read=TRUE WHERE user_id=$1 AND is_read=FALSE', [req.user.id]);
-    res.render('notifications', { title: res.locals.t('notifications'), notifs: r.rows });
-  } catch (e) { next(e); }
-});
+// Platform notifications now live inside the messages inbox — keep the route as a redirect
+router.get('/notifications', requireAuth, (req, res) => res.redirect('/messages'));
 
 // Public freelancer profile (login required) — for companies viewing applicants
 router.get('/freelancers/:id', requireAuth, async (req, res, next) => {

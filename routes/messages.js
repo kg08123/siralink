@@ -74,7 +74,11 @@ router.get('/', requireAuth, async (req, res, next) => {
       c.hasImage = lm.rows.length ? !!lm.rows[0].has_image : false;
       c.unread = await unreadFor(c.id, req.user.id);
     }
-    res.render('messages-inbox', { title: res.locals.t('messages'), convs });
+    // Platform notifications (marked read on view), shown in the "Platform" section above chats
+    const nr = await db.query(
+      'SELECT * FROM notifications WHERE user_id=$1 ORDER BY created_at DESC LIMIT 100', [req.user.id]);
+    await db.query('UPDATE notifications SET is_read=TRUE WHERE user_id=$1 AND is_read=FALSE', [req.user.id]);
+    res.render('messages-inbox', { title: res.locals.t('messages'), convs, notifs: nr.rows });
   } catch (e) { next(e); }
 });
 

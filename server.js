@@ -111,9 +111,8 @@ app.use(async (req, res, next) => {
   }
   res.locals.user = req.user;
   res.locals.company = req.company;
-  // Unread message count for the header badge
+  // Unread chat messages + unread platform notifications, combined, for the header badge
   res.locals.unreadCount = 0;
-  res.locals.notifCount = 0;
   if (req.user) {
     try {
       const u = await db.query(
@@ -128,7 +127,7 @@ app.use(async (req, res, next) => {
       const n = await db.query(
         'SELECT COUNT(*)::int AS n FROM notifications WHERE user_id=$1 AND is_read=FALSE',
         [req.user.id]);
-      res.locals.notifCount = n.rows[0].n;
+      res.locals.unreadCount += n.rows[0].n;
     } catch (e) { /* table may not exist on first boot */ }
   }
   next();

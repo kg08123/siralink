@@ -106,6 +106,7 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .flash.ok{background:#e3f5e9; color:var(--green-dark)}
 .flash.err{background:#fdecec; color:var(--red)}
 .page-title{font-size:1.4rem; font-weight:800; margin:16px 0 4px}
+.section-title{font-size:1.05rem; font-weight:700; margin:18px 2px 10px; color:var(--green)}
 .sub{color:var(--muted); margin:0 0 12px}
 .empty{background:#fff; border-radius:16px; padding:32px 16px; text-align:center; color:var(--muted)}
 .tabs{display:flex; gap:8px; margin:12px 0}
