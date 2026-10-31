@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const db = require('../db');
+const { notify } = require('../lib/notify');
 const { googleEnabled, passport } = require('../lib/google');
 const router = express.Router();
 
@@ -43,6 +44,7 @@ router.post('/signup', async (req, res, next) => {
       );
     }
     req.session.userId = userId;
+    await notify(db, userId, 'welcome', '/', 'welcomeTitle', 'welcomeBody');
     res.redirect('/'); // both roles land on home after registration
   } catch (e) { next(e); }
 });
@@ -150,6 +152,7 @@ if (googleEnabled && passport) {
       }
       delete req.session.pendingGoogle;
       req.session.userId = userId;
+    await notify(db, userId, 'welcome', '/', 'welcomeTitle', 'welcomeBody');
       res.redirect('/');
     } catch (e) { next(e); }
   });

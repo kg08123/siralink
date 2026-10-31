@@ -97,6 +97,11 @@ en: {
   notifRejectedB: '{0} did not select your application for "{1}".',
   notifReminderT: 'Application reminder',
   notifReminderB: '{0}\'s application for "{1}" has been waiting 24 hours.',
+  welcomeTitle: 'Welcome to SiraLink',
+  welcomeBody: 'You\'re in! Browse jobs, apply, and chat with companies — all in one place. Complete your profile to get started.',
+  support: 'Support', supportChat: 'Support chat',
+  supportIntro: 'Questions about SiraLink? Write to our team here.',
+  noSupportThreads: 'No support requests yet.',
 },
 am: {
   appTag: 'የኢትዮጵያ የነፃ ሰራተኞች መድረክ',
@@ -195,6 +200,11 @@ am: {
   notifRejectedB: '{0} ለ"{1}" ያቀረብከውን ማመልከቻ አልመረጠም።',
   notifReminderT: 'የማመልከቻ ማስታወሻ',
   notifReminderB: 'የ{0} ለ"{1}" ማመልከቻ 24 ሰዓት እየጠበቀ ነው።',
+  welcomeTitle: 'እንኳን ወደ SiraLink በደህና መጡ',
+  welcomeBody: 'ገብተዋል! ስራዎችን ይፈልጉ፣ ያመልክቱ እና ከኩባንያዎች ጋር ይወያዩ — ሁሉም በአንድ ቦታ። ለመጀመር መገለጫዎን ያሟሉ።',
+  support: 'ድጋፍ', supportChat: 'የድጋፍ ውይይት',
+  supportIntro: 'ስለ SiraLink ጥያቄ አለዎት? ለቡድናችን እዚህ ይጻፉ።',
+  noSupportThreads: 'እስካሁን ምንም የድጋፍ ጥያቄ የለም።',
 }};
 
 // Categories and cities with translations

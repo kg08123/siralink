@@ -1,0 +1,12 @@
+<%- include('_tabs', { tab: 'supp' }) %>
+<h1 class="page-title"><%= t('supportChat') %></h1>
+<% if (!threads.length) { %><div class="empty"><%= t('noSupportThreads') %></div><% } %>
+<% threads.forEach(function(th){ %>
+  <a class="chat-item <%= th.unread ? 'unread' : '' %>" href="/admin/support/<%= th.user_id %>">
+    <div class="grow">
+      <div class="ci-top"><b><%= th.name %></b><% if (th.unread) { %><span class="badge"><%= th.unread %></span><% } %></div>
+      <div class="sub"><%= th.phone %> · <%= th.role %></div>
+      <div class="ci-prev"><% if (th.last_body) { %><%= th.last_body %><% } %></div>
+    </div>
+  </a>
+<% }) %>

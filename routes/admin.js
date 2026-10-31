@@ -169,4 +169,48 @@ router.post('/announcements', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// Support inbox: read and reply to user support chats
+router.get('/support', async (req, res, next) => {
+  try {
+    const r = await db.query(
+      `SELECT st.user_id, u.name, u.phone, u.role, st.created_at
+       FROM support_threads st JOIN users u ON u.id=st.user_id
+       ORDER BY st.created_at DESC`);
+    const threads = r.rows;
+    for (const th of threads) {
+      const lm = await db.query(
+        'SELECT body, created_at FROM support_messages WHERE user_id=$1 ORDER BY id DESC LIMIT 1', [th.user_id]);
+      th.last_body = lm.rows.length ? lm.rows[0].body : '';
+      th.last_at = lm.rows.length ? lm.rows[0].created_at : th.created_at;
+      const uc = await db.query(
+        "SELECT COUNT(*)::int AS n FROM support_messages WHERE user_id=$1 AND sender='user' AND is_read=FALSE", [th.user_id]);
+      th.unread = uc.rows[0].n;
+    }
+    threads.sort((a, b) => new Date(b.last_at) - new Date(a.last_at));
+    res.render('admin/support', { title: res.locals.t('supportChat'), threads });
+  } catch (e) { next(e); }
+});
+
+router.get('/support/:uid', async (req, res, next) => {
+  try {
+    const uid = Number(req.params.uid);
+    const u = await db.query('SELECT id, name, phone, role FROM users WHERE id=$1', [uid]);
+    if (!u.rows.length) return res.status(404).render('404');
+    await db.query("UPDATE support_messages SET is_read=TRUE WHERE user_id=$1 AND sender='user' AND is_read=FALSE", [uid]);
+    const m = await db.query('SELECT id, sender, body, created_at FROM support_messages WHERE user_id=$1 ORDER BY id ASC LIMIT 200', [uid]);
+    res.render('admin/support-thread', { title: res.locals.t('supportChat'), peer: u.rows[0], messages: m.rows });
+  } catch (e) { next(e); }
+});
+
+router.post('/support/:uid', async (req, res, next) => {
+  try {
+    const uid = Number(req.params.uid);
+    const body = String(req.body.body || '').trim();
+    if (!body) return res.redirect('/admin/support/' + uid);
+    await db.query('INSERT INTO support_threads(user_id) VALUES($1) ON CONFLICT (user_id) DO NOTHING', [uid]);
+    await db.query("INSERT INTO support_messages(user_id, sender, body) VALUES($1,'admin',$2)", [uid, body.slice(0, 2000)]);
+    res.redirect('/admin/support/' + uid);
+  } catch (e) { next(e); }
+});
+
 module.exports = router;

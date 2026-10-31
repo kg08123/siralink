@@ -78,7 +78,8 @@ router.get('/', requireAuth, async (req, res, next) => {
     const nr = await db.query(
       'SELECT * FROM notifications WHERE user_id=$1 ORDER BY created_at DESC LIMIT 100', [req.user.id]);
     await db.query('UPDATE notifications SET is_read=TRUE WHERE user_id=$1 AND is_read=FALSE', [req.user.id]);
-    res.render('messages-inbox', { title: res.locals.t('messages'), convs, notifs: nr.rows });
+    const su = await db.query("SELECT COUNT(*)::int AS n FROM support_messages WHERE user_id=$1 AND sender='admin' AND is_read=FALSE", [req.user.id]);
+    res.render('messages-inbox', { title: res.locals.t('messages'), convs, notifs: nr.rows, supportUnread: su.rows[0].n });
   } catch (e) { next(e); }
 });
 

@@ -1,0 +1,18 @@
+<%- include('_tabs', { tab: 'supp' }) %>
+<h1 class="page-title"><%= peer.name %></h1>
+<p class="sub"><%= peer.phone %> · <%= peer.role %></p>
+<div class="chat" id="chat">
+  <% messages.forEach(function(m){ %>
+    <div class="bubble <%= m.sender==='admin'?'mine':'theirs' %>">
+      <p><%= m.body %></p>
+      <small><%= new Date(m.created_at).toLocaleString() %></small>
+    </div>
+  <% }) %>
+</div>
+<form method="post" action="/admin/support/<%= peer.id %>" class="chatbar">
+  <input type="text" name="body" placeholder="<%= t('typeMessage') %>" autocomplete="off" maxlength="2000" required>
+  <button class="icon-btn" type="submit" aria-label="<%= t('send') %>"><%- icon('send') %></button>
+</form>
+<script>
+(function(){ var c=document.getElementById('chat'); c.scrollTop=c.scrollHeight; })();
+</script>

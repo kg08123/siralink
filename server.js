@@ -170,6 +170,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/messages', require('./routes/messages'));
+app.use('/support', require('./routes/support'));
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/auth'));
 app.use('/f', require('./routes/freelancer'));

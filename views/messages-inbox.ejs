@@ -1,5 +1,12 @@
 <h1 class="page-title"><%= t('messages') %></h1>
 
+<a class="chat-item" href="/support">
+  <div class="grow">
+    <div class="ci-top"><b><%= t('supportChat') %></b><% if (supportUnread) { %><span class="badge"><%= supportUnread %></span><% } %></div>
+    <div class="sub"><%= t('supportIntro') %></div>
+  </div>
+</a>
+
 <h2 class="section-title"><%= t('platformTitle') %></h2>
 <% if (!notifs.length) { %><div class="empty"><%= t('noNotifications') %></div><% } %>
 <% notifs.forEach(function(n){ %>
