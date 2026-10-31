@@ -137,4 +137,36 @@ router.get('/jobs', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// Announcements: admin broadcasts a platform message to users
+router.get('/announcements', (req, res) => {
+  res.render('admin/announcements', { title: res.locals.t('announcements') });
+});
+
+router.post('/announcements', async (req, res, next) => {
+  try {
+    const t = res.locals.t;
+    const audience = ['all', 'freelancer', 'company'].includes(req.body.audience) ? req.body.audience : 'all';
+    const title = String(req.body.title || '').trim();
+    const body = String(req.body.body || '').trim();
+    if (!title || !body) {
+      req.session.flash = { type: 'err', msg: t('annRequired') };
+      return res.redirect('/admin/announcements');
+    }
+    if (body.length > 500) {
+      req.session.flash = { type: 'err', msg: t('annTooLong') };
+      return res.redirect('/admin/announcements');
+    }
+    const roles = audience === 'all' ? ['freelancer', 'company'] : [audience];
+    const inList = roles.map((r) => `'${r}'`).join(',');
+    const r = await db.query(
+      `INSERT INTO notifications(user_id, kind, title, body, link)
+       SELECT id, 'announcement', $1, $2, '/' FROM users WHERE role IN (${inList})
+       RETURNING id`,
+      [JSON.stringify({ k: '__raw', text: title }), JSON.stringify({ k: '__raw', text: body })]
+    );
+    req.session.flash = { type: 'ok', msg: t('annSent').replace('{0}', String(r.rowCount)) };
+    res.redirect('/admin/announcements');
+  } catch (e) { next(e); }
+});
+
 module.exports = router;

@@ -20,6 +20,11 @@ en: {
   pending: 'Pending', approved: 'Approved', rejected: 'Rejected',
   totalUsers: 'Total users', pendingVerifications: 'Pending verifications',
   jobsLive: 'Jobs live', revenueETB: 'Revenue ETB', marketVolume: 'Market volume',
+  announcements: 'Announcements', annAudience: 'Audience', annAll: 'All users',
+  annFreelancers: 'Freelancers only', annCompanies: 'Companies only',
+  annTitle: 'Title', annBody: 'Message', annSend: 'Send announcement',
+  annSent: 'Announcement sent to {0} users',
+  annRequired: 'Title and message are required', annTooLong: 'Message is too long (max 500 characters)',
   budget: 'Budget', city: 'City', category: 'Category', description: 'Description',
   yourProposal: 'Your proposal', proposalPh: 'Why are you right for this job?',
   submitApplication: 'Submit application', uploadReceipt: 'Upload receipt screenshot',
@@ -113,6 +118,11 @@ am: {
   pending: 'በጥበቃ ላይ', approved: 'የጸደቀ', rejected: 'ውድቅ የተደረገ',
   totalUsers: 'ጠቅላላ ተጠቃሚዎች', pendingVerifications: 'ያልተፈተሹ ማረጋገጫዎች',
   jobsLive: 'የታተሙ ስራዎች', revenueETB: 'ገቢ (ብር)', marketVolume: 'የገበያ መጠን',
+  announcements: 'ማስታወቂያዎች', annAudience: 'ተቀባዮች', annAll: 'ሁሉም ተጠቃሚዎች',
+  annFreelancers: 'ነፃ ሰራተኞች ብቻ', annCompanies: 'ኩባንያዎች ብቻ',
+  annTitle: 'ርዕስ', annBody: 'መልእክት', annSend: 'ማስታወቂያ ላክ',
+  annSent: 'ማስታወቂያ ለ{0} ተጠቃሚዎች ተልኳል',
+  annRequired: 'ርዕስ እና መልእክት ያስፈልጋሉ', annTooLong: 'መልእክቱ በጣም ረጅም ነው (ከ500 ቁምፊ በላይ)',
   budget: 'በጀት', city: 'ከተማ', category: 'ምድብ', description: 'መግለጫ',
   yourProposal: 'የእርስዎ ጥያቄ', proposalPh: 'ለምን ለዚህ ስራ ትመጥናለህ?',
   submitApplication: 'ማመልከቻ አስገባ', uploadReceipt: 'የደረሰኝ ቅጽበት ስቀል',
@@ -218,6 +228,7 @@ function nt(lang, stored) {
   try {
     const o = typeof stored === 'string' ? JSON.parse(stored) : stored;
     if (!o || !o.k) return String(stored || '');
+    if (o.k === '__raw') return o.text || '';
     let s = t(lang, o.k);
     (o.p || []).forEach((v, i) => { s = s.split('{' + i + '}').join(String(v)); });
     return s;

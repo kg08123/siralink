@@ -1,0 +1,21 @@
+<h1 class="page-title"><%= t('announcements') %></h1>
+<%- include('_tabs', { tab: 'annc' }) %>
+<form method="post" action="/admin/announcements" class="job-card">
+  <div class="field">
+    <label><%= t('annAudience') %></label>
+    <select name="audience">
+      <option value="all"><%= t('annAll') %></option>
+      <option value="freelancer"><%= t('annFreelancers') %></option>
+      <option value="company"><%= t('annCompanies') %></option>
+    </select>
+  </div>
+  <div class="field">
+    <label><%= t('annTitle') %></label>
+    <input type="text" name="title" maxlength="120" required>
+  </div>
+  <div class="field">
+    <label><%= t('annBody') %></label>
+    <textarea name="body" rows="5" maxlength="500" required></textarea>
+  </div>
+  <button class="btn btn-green" type="submit"><%= t('annSend') %></button>
+</form>
