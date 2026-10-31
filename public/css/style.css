@@ -99,6 +99,7 @@ body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans 
 .stat4 .box{background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px}
 .stat4 .box b{font-size:1.5rem; display:block}
 .stat4 .box small{color:var(--muted)}
+.stat4 a.box{text-decoration:none; color:inherit; display:block}
 table.data{width:100%; border-collapse:collapse; background:#fff; border-radius:14px; overflow:hidden; font-size:.88rem}
 table.data th,table.data td{padding:10px; text-align:left; border-bottom:1px solid var(--line)}
 table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; letter-spacing:.4px}

@@ -2,8 +2,9 @@
 <%- include('_tabs', { tab: 'dash' }) %>
 
 <div class="stat4">
-  <div class="box"><b><%= totalUsers %></b><small><%= t('totalUsers') %></small></div>
-  <div class="box"><b><%= pendingVerifications %></b><small><%= t('pendingVerifications') %></small></div>
-  <div class="box"><b><%= jobsLive %></b><small><%= t('jobsLive') %></small></div>
-  <div class="box"><b><%= Number(revenue).toLocaleString('en-US') %></b><small><%= t('revenueETB') %></small></div>
+  <a class="box" href="/admin/users"><b><%= totalUsers %></b><small><%= t('totalUsers') %></small></a>
+  <a class="box" href="/admin/verifications"><b><%= pendingVerifications %></b><small><%= t('pendingVerifications') %></small></a>
+  <a class="box" href="/admin/jobs"><b><%= jobsLive %></b><small><%= t('jobsLive') %></small></a>
+  <a class="box" href="/admin/payments"><b><%= Number(revenue).toLocaleString('en-US') %></b><small><%= t('revenueETB') %></small></a>
+  <a class="box" href="/admin/jobs"><b><%= Number(marketVolume).toLocaleString('en-US') %> ETB</b><small><%= t('marketVolume') %></small></a>
 </div>

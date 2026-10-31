@@ -13,12 +13,14 @@ router.get('/', async (req, res, next) => {
     const pending = await db.query("SELECT COUNT(*) AS c FROM companies WHERE verification_status='pending'");
     const live = await db.query('SELECT COUNT(*) AS c FROM jobs WHERE published=TRUE');
     const rev = await db.query("SELECT COUNT(*) AS c FROM payments WHERE status='approved'");
+    const vol = await db.query('SELECT COALESCE(SUM(budget_etb),0) AS v FROM jobs');
     res.render('admin/dashboard', {
       title: res.locals.t('adminPanel'),
       totalUsers: users.rows[0].c,
       pendingVerifications: pending.rows[0].c,
       jobsLive: live.rows[0].c,
       revenue: Number(rev.rows[0].c) * POST_FEE,
+      marketVolume: vol.rows[0].v,
     });
   } catch (e) { next(e); }
 });
