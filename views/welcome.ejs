@@ -1,0 +1,28 @@
+<div style="max-width:560px;margin:0 auto;padding:32px 16px 48px;text-align:center">
+  <div class="logo-mark" style="width:64px;height:64px;font-size:32px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center">S</div>
+  <h1 class="page-title" style="margin-bottom:8px"><%= t('welcomePageTitle') %></h1>
+  <p class="sub" style="margin-bottom:24px"><%= t('welcomePageSub') %></p>
+
+  <% const steps = user.role === 'company'
+    ? [[t('wCoStep1T'),t('wCoStep1D')],[t('wCoStep2T'),t('wCoStep2D')],[t('wCoStep3T'),t('wCoStep3D')]]
+    : [[t('wStep1T'),t('wStep1D')],[t('wStep2T'),t('wStep2D')],[t('wStep3T'),t('wStep3D')]]; %>
+  <div style="display:flex;flex-direction:column;gap:12px;text-align:start;margin-bottom:28px">
+    <% steps.forEach(function(s,i){ %>
+      <div class="chat-item" style="cursor:default">
+        <div class="logo-mark" style="width:36px;height:36px;font-size:16px;flex:0 0 auto"><%= i+1 %></div>
+        <div class="grow">
+          <div class="ci-top"><b><%= s[0] %></b></div>
+          <div class="sub"><%= s[1] %></div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <% if (user.role === 'company') { %>
+    <a class="btn btn-green" style="width:100%;margin-bottom:10px" href="/c/post"><%= t('wPostJob') %></a>
+    <a class="btn btn-outline" style="width:100%;margin-bottom:16px" href="/c/dashboard"><%= t('wSkip') %></a>
+  <% } else { %>
+    <a class="btn btn-green" style="width:100%;margin-bottom:10px" href="/f/profile"><%= t('wGoProfile') %></a>
+    <a class="btn btn-outline" style="width:100%;margin-bottom:16px" href="/"><%= t('wBrowseJobs') %></a>
+  <% } %>
+</div>

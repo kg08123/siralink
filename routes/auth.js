@@ -44,7 +44,7 @@ router.post('/signup', async (req, res, next) => {
       );
     }
     req.session.userId = userId;
-    await notify(db, userId, 'welcome', '/', 'welcomeTitle', 'welcomeBody');
+    await notify(db, userId, 'welcome', '/welcome', 'welcomeTitle', 'welcomeBody');
     res.redirect('/'); // both roles land on home after registration
   } catch (e) { next(e); }
 });
@@ -152,7 +152,7 @@ if (googleEnabled && passport) {
       }
       delete req.session.pendingGoogle;
       req.session.userId = userId;
-    await notify(db, userId, 'welcome', '/', 'welcomeTitle', 'welcomeBody');
+    await notify(db, userId, 'welcome', '/welcome', 'welcomeTitle', 'welcomeBody');
       res.redirect('/');
     } catch (e) { next(e); }
   });

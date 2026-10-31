@@ -86,6 +86,11 @@ function buildFilters(q) {
   return { where: where.join(' AND '), params, score };
 }
 
+// Welcome page: opened by tapping the welcome platform notification
+router.get('/welcome', requireAuth, (req, res) => {
+  res.render('welcome', { title: res.locals.t('welcomePageTitle') });
+});
+
 // Home: job feed + filters
 router.get('/', async (req, res, next) => {
   try {
