@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   work_type TEXT NOT NULL CHECK (work_type IN ('online','offline')),
   city TEXT,
   budget_etb INT,
+  pay_type TEXT DEFAULT 'once' CHECK (pay_type IN ('daily','monthly','yearly','once')),
   description TEXT,
   required_docs TEXT DEFAULT '',
   payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending','approved','rejected')),

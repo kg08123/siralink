@@ -34,6 +34,15 @@
     <input type="number" name="budget_etb" min="0" placeholder="5000">
   </div>
   <div class="field">
+    <label><%= t('payType') %></label>
+    <select name="pay_type">
+      <option value="monthly"><%= t('payMonthly') %></option>
+      <option value="daily"><%= t('payDaily') %></option>
+      <option value="yearly"><%= t('payYearly') %></option>
+      <option value="once"><%= t('payOnce') %></option>
+    </select>
+  </div>
+  <div class="field">
     <label><%= t('jobDescription') %></label>
     <textarea name="description" placeholder="..."></textarea>
   </div>

@@ -18,6 +18,8 @@ if (process.env.DATABASE_URL && !process.env.USE_PGMEM) {
   const schema = fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8');
   db.query(schema)
     .then(() => console.log('schema ensured'))
+    .then(() => db.query(`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS pay_type TEXT DEFAULT 'once' CHECK (pay_type IN ('daily','monthly','yearly','once'))`))
+    .then(() => console.log('pay_type ensured'))
     .then(async () => {
       // One-time demo seed (only when users table is empty)
       if (process.env.SEED_DEMO === '1') {
@@ -77,6 +79,7 @@ app.use((req, res, next) => {
     return '★'.repeat(f) + '☆'.repeat(5 - f);
   };
   res.locals.fmtETB = (n) => (n === null || n === undefined || n === '' ? '' : Number(n).toLocaleString('en-US') + ' ETB');
+  res.locals.paySuffix = (pt) => ({ daily: res.locals.t('perDay'), monthly: res.locals.t('perMonth'), yearly: res.locals.t('perYear') }[pt] || res.locals.t('perOnce'));
   res.locals.icon = icon;
   res.locals.CATEGORIES = CATEGORIES;
   res.locals.CITIES = CITIES;

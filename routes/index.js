@@ -3,7 +3,7 @@ const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const router = express.Router();
 
-const JOB_COLS = `j.id, j.company_id, j.title, j.category, j.work_type, j.city, j.budget_etb,
+const JOB_COLS = `j.id, j.company_id, j.title, j.category, j.work_type, j.city, j.budget_etb, j.pay_type,
   j.description, j.required_docs, j.payment_status, j.published, j.created_at,
   c.company_name, c.verified, c.rating_avg, c.rating_count,
   COALESCE(l.likes, 0) AS like_count`;

@@ -48,7 +48,7 @@ router.post('/post', async (req, res, next) => {
       req.session.flash = { type: 'err', msg: t('unverifiedNote') };
       return res.redirect('/c/dashboard');
     }
-    const { title, category, work_type, city, budget_etb, description } = req.body;
+    const { title, category, work_type, city, budget_etb, pay_type, description } = req.body;
     let docs = req.body.docs;
     if (!Array.isArray(docs)) docs = docs ? [docs] : [];
     docs = docs.map((d) => String(d).trim()).filter(Boolean);
@@ -57,11 +57,12 @@ router.post('/post', async (req, res, next) => {
       return res.redirect('/c/post');
     }
     const r = await db.query(
-      `INSERT INTO jobs(company_id,title,category,work_type,city,budget_etb,description,required_docs)
-       VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
+      `INSERT INTO jobs(company_id,title,category,work_type,city,budget_etb,pay_type,description,required_docs)
+       VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
       [req.company.id, title.trim(), category,
        work_type === 'online' ? 'online' : 'offline',
        (city || '').trim() || null, budget_etb ? Number(budget_etb) : null,
+       ['daily','monthly','yearly','once'].includes(pay_type) ? pay_type : 'monthly',
        (description || '').trim() || null, docs.join(', ')]);
     req.session.flash = { type: 'ok', msg: t('jobPosted') };
     res.redirect('/c/post/payment/' + r.rows[0].id);
@@ -107,7 +108,7 @@ router.post('/post/payment/:jobId', upload.single('receipt'), async (req, res, n
 router.get('/jobs', async (req, res, next) => {
   try {
     const r = await db.query(
-      `SELECT id, title, work_type, budget_etb, payment_status, published, created_at
+      `SELECT id, title, work_type, budget_etb, pay_type, payment_status, published, created_at
        FROM jobs WHERE company_id=$1 ORDER BY created_at DESC`, [req.company.id]);
     const jobs = r.rows;
     if (jobs.length) {
