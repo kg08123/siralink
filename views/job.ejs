@@ -13,7 +13,7 @@
   <div class="meta-line">
     <span class="tag <%= job.work_type==='online'?'tag-online':'tag-offline' %>"><%= t(job.work_type) %></span>
     <span class="mi"><%- icon('pin') %> <%= cityName(job.city, lang) %></span>
-    <span class="budget mi"><%- icon('cash') %> <%= fmtETB(job.budget_etb) %> <%= paySuffix(job.pay_type) %></span>
+    <span class="budget mi"><%- icon('cash') %> <%= fmtETB(job.budget_etb) %><%= job.budget_etb ? ' ' + paySuffix(job.pay_type) : '' %></span>
   </div>
   <div class="stat3">
     <% if (user) { %>

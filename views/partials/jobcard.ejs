@@ -8,7 +8,7 @@
     <div class="meta-line">
       <span class="mi"><%- icon('pin') %> <%= cityName(j.city, lang) %></span>
       <span class="tag <%= j.work_type === 'online' ? 'tag-online' : 'tag-offline' %>"><%= t(j.work_type) %></span>
-      <span class="budget mi"><%- icon('cash') %> <%= fmtETB(j.budget_etb) %> <%= paySuffix(j.pay_type) %></span>
+      <span class="budget mi"><%- icon('cash') %> <%= fmtETB(j.budget_etb) %><%= j.budget_etb ? ' ' + paySuffix(j.pay_type) : '' %></span>
     </div>
   </a>
   <div class="stats-line">
