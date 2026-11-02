@@ -14,9 +14,14 @@ router.get('/signup', (req, res) => {
 router.post('/signup', async (req, res, next) => {
   try {
     const t = res.locals.t;
-    const { role, name, phone, password, profession, skills, company_name, license_no, tin } = req.body;
+    const { role, name, phone, password, email, profession, skills, company_name, license_no, tin } = req.body;
     if (!['freelancer', 'company'].includes(role) || !name || !phone || !password) {
       req.session.flash = { type: 'err', msg: t('fillAll') };
+      return res.redirect('/signup');
+    }
+    const emailTrim = (email || '').trim().toLowerCase();
+    if (emailTrim && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) {
+      req.session.flash = { type: 'err', msg: t('invalidEmail') };
       return res.redirect('/signup');
     }
     const exists = await db.query('SELECT id FROM users WHERE phone=$1', [phone.trim()]);
@@ -24,10 +29,18 @@ router.post('/signup', async (req, res, next) => {
       req.session.flash = { type: 'err', msg: t('phoneTaken') };
       return res.redirect('/signup');
     }
+    if (emailTrim) {
+      const emailExists = await db.query('SELECT id FROM users WHERE email=$1', [emailTrim]);
+      if (emailExists.rows.length) {
+        req.session.flash = { type: 'err', msg: t('invalidEmail') };
+        return res.redirect('/signup');
+      }
+    }
     const hash = await bcrypt.hash(password, 10);
+    const emailToken = emailTrim ? crypto.randomBytes(32).toString('hex') : null;
     const u = await db.query(
-      'INSERT INTO users(role,name,phone,password_hash) VALUES($1,$2,$3,$4) RETURNING id',
-      [role, name.trim(), phone.trim(), hash]
+      'INSERT INTO users(role,name,phone,password_hash,email,email_token) VALUES($1,$2,$3,$4,$5,$6) RETURNING id',
+      [role, name.trim(), phone.trim(), hash, emailTrim || null, emailToken]
     );
     const userId = u.rows[0].id;
     if (role === 'freelancer') {
@@ -45,6 +58,15 @@ router.post('/signup', async (req, res, next) => {
     }
     req.session.userId = userId;
     await notify(db, userId, 'welcome', '/welcome', 'welcomeTitle', 'welcomeBody');
+    if (emailToken) {
+      const { sendVerificationEmail, mailerEnabled, BASE_URL } = require('../lib/mailer');
+      if (mailerEnabled()) {
+        try {
+          await sendVerificationEmail(emailTrim, `${BASE_URL}/verify-email/${emailToken}`);
+          req.session.flash = { type: 'ok', msg: t('checkInbox') };
+        } catch (e) { console.error('[mailer] send failed:', e.message); }
+      }
+    }
     res.redirect('/'); // both roles land on home after registration
   } catch (e) { next(e); }
 });
@@ -132,9 +154,18 @@ if (googleEnabled && passport) {
       }
       // Random unusable password — this account signs in via Google only
       const hash = await bcrypt.hash(crypto.randomBytes(24).toString('hex'), 10);
+      const gEmail = (pg.email || '').trim().toLowerCase() || null;
+      if (gEmail) {
+        const emailExists = await db.query('SELECT id FROM users WHERE email=$1', [gEmail]);
+        if (emailExists.rows.length) {
+          req.session.flash = { type: 'err', msg: t('invalidEmail') };
+          return res.redirect('/signup/google');
+        }
+      }
+      // Google-confirmed email: trusted, mark verified immediately, no email sent
       const u = await db.query(
-        'INSERT INTO users(role,name,phone,password_hash,google_id,email,avatar_url) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id',
-        [role, name.trim(), phone.trim(), hash, pg.google_id, pg.email, pg.avatar_url]
+        'INSERT INTO users(role,name,phone,password_hash,google_id,email,avatar_url,email_verified,email_token) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id',
+        [role, name.trim(), phone.trim(), hash, pg.google_id, gEmail, pg.avatar_url, Boolean(gEmail), null]
       );
       const userId = u.rows[0].id;
       if (role === 'freelancer') {
@@ -157,5 +188,42 @@ if (googleEnabled && passport) {
     } catch (e) { next(e); }
   });
 }
+
+// Email verification: user taps the link from the verification email
+router.get('/verify-email/:token', async (req, res, next) => {
+  try {
+    const t = res.locals.t;
+    const r = await db.query('SELECT id, email_verified FROM users WHERE email_token=$1', [req.params.token]);
+    if (!r.rows.length) {
+      req.session.flash = { type: 'err', msg: t('invalidToken') };
+      return res.redirect(req.session.userId ? '/' : '/signin');
+    }
+    await db.query('UPDATE users SET email_verified=TRUE, email_token=NULL WHERE id=$1', [r.rows[0].id]);
+    req.session.flash = { type: 'ok', msg: t('emailVerified') };
+    res.redirect(req.session.userId ? '/' : '/signin');
+  } catch (e) { next(e); }
+});
+
+// Resend verification email (dashboard button, only when email set + unverified)
+router.post('/resend-verification', async (req, res, next) => {
+  try {
+    const t = res.locals.t;
+    if (!req.session.userId) return res.redirect('/signin');
+    const r = await db.query('SELECT id, email, email_verified FROM users WHERE id=$1', [req.session.userId]);
+    const u = r.rows[0];
+    if (u && u.email && !u.email_verified) {
+      const token = crypto.randomBytes(32).toString('hex');
+      await db.query('UPDATE users SET email_token=$1 WHERE id=$2', [token, u.id]);
+      const { sendVerificationEmail, mailerEnabled, BASE_URL } = require('../lib/mailer');
+      if (mailerEnabled()) {
+        try {
+          await sendVerificationEmail(u.email, `${BASE_URL}/verify-email/${token}`);
+          req.session.flash = { type: 'ok', msg: t('emailSent') };
+        } catch (e) { console.error('[mailer] resend failed:', e.message); }
+      }
+    }
+    res.redirect(req.get('Referrer') || '/');
+  } catch (e) { next(e); }
+});
 
 module.exports = router;

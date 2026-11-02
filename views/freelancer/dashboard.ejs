@@ -1,5 +1,13 @@
 <h1 class="page-title"><%= t('dashboard') %></h1>
 <p class="sub"><%= user.name %> · <%= catName(profile.profession, lang) %></p>
+<% if (user.email && !user.email_verified) { %>
+  <div class="chat-item" style="cursor:default;margin-bottom:12px">
+    <div class="grow"><div class="sub">✉️ <%= t('verifyEmailPrompt') %></div></div>
+    <form method="post" action="/resend-verification" style="flex:0 0 auto">
+      <button class="btn btn-amber btn-sm" type="submit"><%= t('resendVerification') %></button>
+    </form>
+  </div>
+<% } %>
 
 <div class="stat4">
   <div class="box"><b><%= counts.total %></b><small><%= t('myApplications') %></small></div>

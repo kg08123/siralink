@@ -186,6 +186,8 @@ router.get('/companies/:id', async (req, res, next) => {
     const jobs = await enrichJobs(jr.rows, req.user && req.user.id);
     const totalLikes = await companyLikes(company.id);
     const rc = await db.query('SELECT COUNT(*)::int AS n FROM reviews WHERE company_id=$1', [company.id]);
+    const uv = await db.query('SELECT email_verified FROM users WHERE id=$1', [company.user_id]);
+    company.email_verified = uv.rows.length ? uv.rows[0].email_verified : false;
     const rev = await db.query(
       `SELECT r.comment, r.created_at, u.name AS reviewer_name
        FROM reviews r JOIN users u ON u.id = r.freelancer_user_id
@@ -201,7 +203,7 @@ router.get('/notifications', requireAuth, (req, res) => res.redirect('/messages'
 router.get('/freelancers/:id', requireAuth, async (req, res, next) => {
   try {
     const u = await db.query(
-      `SELECT u.id, u.name, u.phone, u.email, u.avatar_url, u.created_at,
+      `SELECT u.id, u.name, u.phone, u.email, u.email_verified, u.avatar_url, u.created_at,
               f.profession, f.skills, f.bio
        FROM users u LEFT JOIN freelancers f ON f.user_id = u.id
        WHERE u.id = $1 AND u.role = 'freelancer'`, [req.params.id]);

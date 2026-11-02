@@ -5,7 +5,8 @@
     <div class="avatar-lg avatar-ph"><%- icon('users') %></div>
   <% } %>
   <div>
-    <h1 class="page-title" style="margin:0"><%= freelancer.name %></h1>
+    <h1 class="page-title" style="margin:0"><%= freelancer.name %>
+      <% if (freelancer.email_verified) { %> <span class="badge-verified">✓ <%= t('verifiedBadge') %></span><% } %></h1>
     <p class="sub"><%= freelancer.profession ? catName(freelancer.profession, lang) : t('freelancer') %></p>
   </div>
 </div>

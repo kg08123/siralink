@@ -11,6 +11,14 @@
   <% if (company.verification_status !== 'approved') { %>
     <p class="sub" style="margin:10px 0 0">⏳ <%= t('unverifiedNote') %></p>
   <% } %>
+  <% if (user.email && !user.email_verified) { %>
+    <div class="chat-item" style="cursor:default;margin-top:12px">
+      <div class="grow"><div class="sub">✉️ <%= t('verifyEmailPrompt') %></div></div>
+      <form method="post" action="/resend-verification" style="flex:0 0 auto">
+        <button class="btn btn-amber btn-sm" type="submit"><%= t('resendVerification') %></button>
+      </form>
+    </div>
+  <% } %>
 </div>
 
 <div class="stat4">

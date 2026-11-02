@@ -20,6 +20,9 @@ if (process.env.DATABASE_URL && !process.env.USE_PGMEM) {
     .then(() => console.log('schema ensured'))
     .then(() => db.query(`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS pay_type TEXT DEFAULT 'once' CHECK (pay_type IN ('daily','monthly','yearly','once'))`))
     .then(() => console.log('pay_type ensured'))
+    .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE`))
+    .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_token TEXT`))
+    .then(() => console.log('email verification columns ensured'))
     .then(async () => {
       // One-time demo seed (only when users table is empty)
       if (process.env.SEED_DEMO === '1') {
@@ -100,7 +103,7 @@ app.use(async (req, res, next) => {
   req.company = null;
   if (req.session.userId) {
     try {
-      const r = await db.query('SELECT id, role, name, phone FROM users WHERE id=$1', [req.session.userId]);
+      const r = await db.query('SELECT id, role, name, phone, email, email_verified FROM users WHERE id=$1', [req.session.userId]);
       if (r.rows.length) {
         req.user = r.rows[0];
         if (req.user.role === 'company') {
