@@ -4,7 +4,7 @@
 <form method="post" action="/signin">
   <div class="field">
     <label><%= t('emailOrPhone') %></label>
-    <input type="text" name="login" placeholder="you@example.com" required>
+    <input type="text" name="login" placeholder="you@example.com" value="<%= typeof login !== 'undefined' ? login : '' %>" required>
   </div>
   <div class="field">
     <label><%= t('password') %></label>

@@ -73,7 +73,9 @@ router.post('/signup', async (req, res, next) => {
 
 router.get('/signin', (req, res) => {
   if (req.user) return res.redirect('/');
-  res.render('auth/signin', { title: res.locals.t('signIn') });
+  const login = req.session.loginAttempt || '';
+  delete req.session.loginAttempt;
+  res.render('auth/signin', { title: res.locals.t('signIn'), login });
 });
 
 router.post('/signin', async (req, res, next) => {
@@ -88,6 +90,7 @@ router.post('/signin', async (req, res, next) => {
     const user = r.rows[0];
     if (!user || !(await bcrypt.compare(password || '', user.password_hash))) {
       req.session.flash = { type: 'err', msg: t('invalidLogin') };
+      req.session.loginAttempt = login; // keep what they typed
       return res.redirect('/signin');
     }
     req.session.userId = user.id;
