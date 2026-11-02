@@ -79,8 +79,12 @@ router.get('/signin', (req, res) => {
 router.post('/signin', async (req, res, next) => {
   try {
     const t = res.locals.t;
-    const { phone, password } = req.body;
-    const r = await db.query('SELECT * FROM users WHERE phone=$1', [(phone || '').trim()]);
+    const { password } = req.body;
+    const login = (req.body.login || '').trim();
+    // Accept email or phone in the same field (existing phone users + admin keep working)
+    const r = login.includes('@')
+      ? await db.query('SELECT * FROM users WHERE email=$1', [login.toLowerCase()])
+      : await db.query('SELECT * FROM users WHERE phone=$1', [login]);
     const user = r.rows[0];
     if (!user || !(await bcrypt.compare(password || '', user.password_hash))) {
       req.session.flash = { type: 'err', msg: t('invalidLogin') };
