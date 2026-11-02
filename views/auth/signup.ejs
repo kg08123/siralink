@@ -6,11 +6,11 @@
     <label><%= t('iAmA') %></label>
     <div class="role-cards">
       <label class="role-card sel" id="card-freelancer">
-        <input type="radio" name="role" value="freelancer" checked>
+        <input type="radio" name="role" value="freelancer" <%= (!form.role || form.role==='freelancer') ? 'checked' : '' %>>
         <div><b>💼 <%= t('freelancer') %> — <%= t('findJobs') %></b><small><%= t('signupFreelancerDesc') %></small></div>
       </label>
       <label class="role-card" id="card-company">
-        <input type="radio" name="role" value="company">
+        <input type="radio" name="role" value="company" <%= form.role==='company' ? 'checked' : '' %>>
         <div><b>🏢 <%= t('company') %> — <%= t('hireTalent') %></b><small><%= t('signupCompanyDesc') %></small></div>
       </label>
     </div>
@@ -19,31 +19,31 @@
   <h3><%= t('accountDetails') %></h3>
   <div class="field" id="nameField">
     <label><%= t('fullName') %> *</label>
-    <input type="text" name="name" required>
+    <input type="text" name="name" value="<%= form.name || '' %>" required>
   </div>
   <div class="field role-extra" id="extra-company">
     <label><%= t('companyName') %> *</label>
-    <input type="text" name="company_name">
+    <input type="text" name="company_name" value="<%= form.company_name || '' %>">
     <label style="margin-top:12px"><%= t('licenseNo') %></label>
-    <input type="text" name="license_no" placeholder="ET-000000">
+    <input type="text" name="license_no" placeholder="ET-000000" value="<%= form.license_no || '' %>">
     <label style="margin-top:12px"><%= t('tin') %></label>
-    <input type="text" name="tin" placeholder="0000000000">
+    <input type="text" name="tin" placeholder="0000000000" value="<%= form.tin || '' %>">
   </div>
   <div class="field role-extra show" id="extra-freelancer">
     <label><%= t('whatDoYouDo') %> *</label>
     <select name="profession">
-      <% CATEGORIES.forEach(function(c){ %><option value="<%= c[0] %>"><%= lang==='am'?c[2]:c[1] %></option><% }) %>
+      <% CATEGORIES.forEach(function(c){ %><option value="<%= c[0] %>" <%= form.profession===c[0] ? 'selected' : '' %>><%= lang==='am'?c[2]:c[1] %></option><% }) %>
     </select>
     <label style="margin-top:12px"><%= t('skills') %></label>
-    <input type="text" name="skills" placeholder="Photoshop, Figma">
+    <input type="text" name="skills" placeholder="Photoshop, Figma" value="<%= form.skills || '' %>">
   </div>
   <div class="field">
     <label><%= t('phone') %> *</label>
-    <input type="text" name="phone" placeholder="+251 9XX XXX XXX" required>
+    <input type="text" name="phone" placeholder="+251 9XX XXX XXX" value="<%= form.phone || '' %>" required>
   </div>
   <div class="field">
     <label><%= t('emailOptional') %></label>
-    <input type="email" name="email" placeholder="you@example.com">
+    <input type="email" name="email" placeholder="you@example.com" value="<%= form.email || '' %>">
   </div>
   <div class="field">
     <label><%= t('password') %> *</label>

@@ -8,31 +8,39 @@ const router = express.Router();
 
 router.get('/signup', (req, res) => {
   if (req.user) return res.redirect('/');
-  res.render('auth/signup', { title: res.locals.t('signUp') });
+  const form = req.session.signupAttempt || {};
+  delete req.session.signupAttempt;
+  res.render('auth/signup', { title: res.locals.t('signUp'), form });
 });
 
 router.post('/signup', async (req, res, next) => {
   try {
     const t = res.locals.t;
     const { role, name, phone, password, email, profession, skills, company_name, license_no, tin } = req.body;
+    // Keep what they typed so a failed signup doesn't wipe the form (never the password)
+    const stash = () => { req.session.signupAttempt = { role, name, phone, email, profession, skills, company_name, license_no, tin }; };
     if (!['freelancer', 'company'].includes(role) || !name || !phone || !password) {
       req.session.flash = { type: 'err', msg: t('fillAll') };
+      stash();
       return res.redirect('/signup');
     }
     const emailTrim = (email || '').trim().toLowerCase();
     if (emailTrim && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) {
       req.session.flash = { type: 'err', msg: t('invalidEmail') };
+      stash();
       return res.redirect('/signup');
     }
     const exists = await db.query('SELECT id FROM users WHERE phone=$1', [phone.trim()]);
     if (exists.rows.length) {
       req.session.flash = { type: 'err', msg: t('phoneTaken') };
+      stash();
       return res.redirect('/signup');
     }
     if (emailTrim) {
       const emailExists = await db.query('SELECT id FROM users WHERE email=$1', [emailTrim]);
       if (emailExists.rows.length) {
-        req.session.flash = { type: 'err', msg: t('invalidEmail') };
+        req.session.flash = { type: 'err', msg: t('emailTaken') };
+        stash();
         return res.redirect('/signup');
       }
     }
@@ -49,6 +57,7 @@ router.post('/signup', async (req, res, next) => {
     } else {
       if (!company_name) {
         req.session.flash = { type: 'err', msg: t('fillAll') };
+        stash();
         return res.redirect('/signup');
       }
       await db.query(
