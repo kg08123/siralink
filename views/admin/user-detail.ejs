@@ -18,6 +18,8 @@
   <table class="data kv" style="margin-top:14px">
     <tr><th><%= t('phone') %></th><td><%= user.phone %></td></tr>
     <tr><th><%= t('email') %></th><td><%= user.email || '—' %></td></tr>
+    <tr><th><%= t('gender') %></th><td><%= user.gender ? (user.gender === 'female' ? t('female') : t('male')) : '—' %></td></tr>
+    <tr><th><%= t('age') %></th><td><%= user.age || '—' %></td></tr>
     <tr><th><%= t('createdAt') %></th><td><%= new Date(user.created_at).toLocaleString() %></td></tr>
   </table>
 

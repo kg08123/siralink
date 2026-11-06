@@ -42,6 +42,18 @@
     <input type="text" name="phone" placeholder="+251 9XX XXX XXX" value="<%= form.phone || '' %>" required>
   </div>
   <div class="field">
+    <label><%= t('gender') %> *</label>
+    <select name="gender" required>
+      <option value="" <%= !form.gender ? 'selected' : '' %> disabled>—</option>
+      <option value="male" <%= form.gender==='male' ? 'selected' : '' %>><%= t('male') %></option>
+      <option value="female" <%= form.gender==='female' ? 'selected' : '' %>><%= t('female') %></option>
+    </select>
+  </div>
+  <div class="field">
+    <label><%= t('age') %> *</label>
+    <input type="number" name="age" min="13" max="100" placeholder="19" value="<%= form.age || '' %>" required>
+  </div>
+  <div class="field">
     <label><%= t('emailOptional') %></label>
     <input type="email" name="email" placeholder="you@example.com" value="<%= form.email || '' %>">
   </div>

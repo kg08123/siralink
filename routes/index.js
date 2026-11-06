@@ -203,7 +203,7 @@ router.get('/notifications', requireAuth, (req, res) => res.redirect('/messages'
 router.get('/freelancers/:id', requireAuth, async (req, res, next) => {
   try {
     const u = await db.query(
-      `SELECT u.id, u.name, u.phone, u.email, u.email_verified, u.avatar_url, u.created_at,
+      `SELECT u.id, u.name, u.phone, u.email, u.email_verified, u.avatar_url, u.created_at, u.gender, u.age,
               f.profession, f.skills, f.bio
        FROM users u LEFT JOIN freelancers f ON f.user_id = u.id
        WHERE u.id = $1 AND u.role = 'freelancer'`, [req.params.id]);

@@ -24,6 +24,8 @@ if (process.env.DATABASE_URL && !process.env.USE_PGMEM) {
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_token TEXT`))
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT`))
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMPTZ`))
+    .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS gender TEXT`))
+    .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS age INT`))
     .then(() => console.log('email verification columns ensured'))
     .then(async () => {
       // One-time demo seed (only when users table is empty)

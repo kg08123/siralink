@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
   email_token TEXT,
   reset_token TEXT,
   reset_expires TIMESTAMPTZ,
+  gender TEXT CHECK (gender IN ('male','female')),
+  age INT CHECK (age IS NULL OR (age >= 13 AND age <= 100)),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

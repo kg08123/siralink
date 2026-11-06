@@ -16,11 +16,22 @@ router.get('/signup', (req, res) => {
 router.post('/signup', async (req, res, next) => {
   try {
     const t = res.locals.t;
-    const { role, name, phone, password, email, profession, skills, company_name, license_no, tin } = req.body;
+    const { role, name, phone, password, email, profession, skills, company_name, license_no, tin, gender, age } = req.body;
     // Keep what they typed so a failed signup doesn't wipe the form (never the password)
-    const stash = () => { req.session.signupAttempt = { role, name, phone, email, profession, skills, company_name, license_no, tin }; };
+    const stash = () => { req.session.signupAttempt = { role, name, phone, email, profession, skills, company_name, license_no, tin, gender, age }; };
     if (!['freelancer', 'company'].includes(role) || !name || !phone || !password) {
       req.session.flash = { type: 'err', msg: t('fillAll') };
+      stash();
+      return res.redirect('/signup');
+    }
+    if (!['male', 'female'].includes(gender)) {
+      req.session.flash = { type: 'err', msg: t('fillAll') };
+      stash();
+      return res.redirect('/signup');
+    }
+    const ageNum = parseInt((age || '').toString().trim(), 10);
+    if (!Number.isInteger(ageNum) || ageNum < 13 || ageNum > 100) {
+      req.session.flash = { type: 'err', msg: t('invalidAge') };
       stash();
       return res.redirect('/signup');
     }
@@ -47,8 +58,8 @@ router.post('/signup', async (req, res, next) => {
     const hash = await bcrypt.hash(password, 10);
     const emailToken = emailTrim ? crypto.randomBytes(32).toString('hex') : null;
     const u = await db.query(
-      'INSERT INTO users(role,name,phone,password_hash,email,email_token) VALUES($1,$2,$3,$4,$5,$6) RETURNING id',
-      [role, name.trim(), phone.trim(), hash, emailTrim || null, emailToken]
+      'INSERT INTO users(role,name,phone,password_hash,email,email_token,gender,age) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id',
+      [role, name.trim(), phone.trim(), hash, emailTrim || null, emailToken, gender, ageNum]
     );
     const userId = u.rows[0].id;
     if (role === 'freelancer') {
@@ -158,9 +169,18 @@ if (googleEnabled && passport) {
       const pg = req.session.pendingGoogle;
       if (!pg) return res.redirect('/signup');
       const t = res.locals.t;
-      const { role, name, phone, profession, skills, company_name, license_no, tin } = req.body;
+      const { role, name, phone, profession, skills, company_name, license_no, tin, gender, age } = req.body;
       if (!['freelancer', 'company'].includes(role) || !name || !phone) {
         req.session.flash = { type: 'err', msg: t('fillAll') };
+        return res.redirect('/signup/google');
+      }
+      if (!['male', 'female'].includes(gender)) {
+        req.session.flash = { type: 'err', msg: t('fillAll') };
+        return res.redirect('/signup/google');
+      }
+      const ageNum = parseInt((age || '').toString().trim(), 10);
+      if (!Number.isInteger(ageNum) || ageNum < 13 || ageNum > 100) {
+        req.session.flash = { type: 'err', msg: t('invalidAge') };
         return res.redirect('/signup/google');
       }
       const exists = await db.query('SELECT id FROM users WHERE phone=$1', [phone.trim()]);
@@ -180,8 +200,8 @@ if (googleEnabled && passport) {
       }
       // Google-confirmed email: trusted, mark verified immediately, no email sent
       const u = await db.query(
-        'INSERT INTO users(role,name,phone,password_hash,google_id,email,avatar_url,email_verified,email_token) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id',
-        [role, name.trim(), phone.trim(), hash, pg.google_id, gEmail, pg.avatar_url, Boolean(gEmail), null]
+        'INSERT INTO users(role,name,phone,password_hash,google_id,email,avatar_url,email_verified,email_token,gender,age) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING id',
+        [role, name.trim(), phone.trim(), hash, pg.google_id, gEmail, pg.avatar_url, Boolean(gEmail), null, gender, ageNum]
       );
       const userId = u.rows[0].id;
       if (role === 'freelancer') {
