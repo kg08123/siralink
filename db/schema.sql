@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT,
   email_verified BOOLEAN DEFAULT FALSE,
   email_token TEXT,
+  reset_token TEXT,
+  reset_expires TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

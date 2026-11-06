@@ -22,6 +22,8 @@ if (process.env.DATABASE_URL && !process.env.USE_PGMEM) {
     .then(() => console.log('pay_type ensured'))
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE`))
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_token TEXT`))
+    .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token TEXT`))
+    .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMPTZ`))
     .then(() => console.log('email verification columns ensured'))
     .then(async () => {
       // One-time demo seed (only when users table is empty)

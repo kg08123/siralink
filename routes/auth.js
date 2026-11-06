@@ -242,4 +242,62 @@ router.post('/resend-verification', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// Forgot password: ask for email, send reset link (never reveals whether the email exists)
+router.get('/forgot-password', (req, res) => {
+  res.render('auth/forgot-password', { title: res.locals.t('forgotPassword') });
+});
+
+router.post('/forgot-password', async (req, res, next) => {
+  try {
+    const t = res.locals.t;
+    const email = (req.body.email || '').trim().toLowerCase();
+    if (email) {
+      const r = await db.query('SELECT id FROM users WHERE email=$1', [email]);
+      if (r.rows.length) {
+        const token = crypto.randomBytes(32).toString('hex');
+        await db.query('UPDATE users SET reset_token=$1, reset_expires=NOW() + INTERVAL \'1 hour\' WHERE id=$2', [token, r.rows[0].id]);
+        const { sendPasswordResetEmail, mailerEnabled, BASE_URL } = require('../lib/mailer');
+        if (mailerEnabled()) {
+          try { await sendPasswordResetEmail(email, `${BASE_URL}/reset-password/${token}`); }
+          catch (e) { console.error('[mailer] reset send failed:', e.message); }
+        }
+      }
+    }
+    req.session.flash = { type: 'ok', msg: t('resetLinkSent') };
+    res.redirect('/signin');
+  } catch (e) { next(e); }
+});
+
+router.get('/reset-password/:token', async (req, res, next) => {
+  try {
+    const t = res.locals.t;
+    const r = await db.query('SELECT id FROM users WHERE reset_token=$1 AND reset_expires > NOW()', [req.params.token]);
+    if (!r.rows.length) {
+      req.session.flash = { type: 'err', msg: t('invalidResetToken') };
+      return res.redirect('/forgot-password');
+    }
+    res.render('auth/reset-password', { title: t('resetPassword'), token: req.params.token });
+  } catch (e) { next(e); }
+});
+
+router.post('/reset-password/:token', async (req, res, next) => {
+  try {
+    const t = res.locals.t;
+    const { password, password2 } = req.body;
+    const r = await db.query('SELECT id FROM users WHERE reset_token=$1 AND reset_expires > NOW()', [req.params.token]);
+    if (!r.rows.length) {
+      req.session.flash = { type: 'err', msg: t('invalidResetToken') };
+      return res.redirect('/forgot-password');
+    }
+    if (!password || password.length < 4 || password !== password2) {
+      req.session.flash = { type: 'err', msg: t('passwordsDontMatch') };
+      return res.redirect('/reset-password/' + req.params.token);
+    }
+    const hash = await bcrypt.hash(password, 10);
+    await db.query('UPDATE users SET password_hash=$1, reset_token=NULL, reset_expires=NULL WHERE id=$2', [hash, r.rows[0].id]);
+    req.session.flash = { type: 'ok', msg: t('passwordResetOk') };
+    res.redirect('/signin');
+  } catch (e) { next(e); }
+});
+
 module.exports = router;
