@@ -1,0 +1,18 @@
+<h1 class="page-title" style="text-align:center">✉️ <%= t('verifyEmailTitle') %></h1>
+<p class="sub" style="text-align:center"><%= t('verifyEmailBody') %></p>
+<% if (email) { %>
+  <p style="text-align:center"><b><%= email %></b></p>
+<% } %>
+
+<form method="post" action="/verify-email/resend">
+  <% if (!email) { %>
+    <div class="field">
+      <label><%= t('email') %></label>
+      <input type="email" name="email" placeholder="you@example.com" required>
+    </div>
+  <% } else { %>
+    <input type="hidden" name="email" value="<%= email %>">
+  <% } %>
+  <button class="btn btn-green" type="submit"><%= t('resendLink') %></button>
+</form>
+<p class="sub" style="text-align:center;margin-top:14px"><a href="/signin" style="color:var(--green);font-weight:700"><%= t('backToSignIn') %></a></p>

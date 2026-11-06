@@ -76,18 +76,19 @@ router.post('/signup', async (req, res, next) => {
         [userId, company_name.trim(), phone.trim(), (license_no || '').trim() || null, (tin || '').trim() || null]
       );
     }
-    req.session.userId = userId;
     await notify(db, userId, 'welcome', '/welcome', 'welcomeTitle', 'welcomeBody');
     if (emailToken) {
       const { sendVerificationEmail, mailerEnabled, BASE_URL } = require('../lib/mailer');
       if (mailerEnabled()) {
-        try {
-          await sendVerificationEmail(emailTrim, `${BASE_URL}/verify-email/${emailToken}`);
-          req.session.flash = { type: 'ok', msg: t('checkInbox') };
-        } catch (e) { console.error('[mailer] send failed:', e.message); }
+        try { await sendVerificationEmail(emailTrim, `${BASE_URL}/verify-email/${emailToken}`); }
+        catch (e) { console.error('[mailer] send failed:', e.message); }
       }
+      // Verify first: do NOT log in or go home — send them to the verify page
+      req.session.pendingVerificationEmail = emailTrim;
+      return res.redirect('/verify-email');
     }
-    res.redirect('/'); // both roles land on home after registration
+    req.session.userId = userId;
+    res.redirect('/'); // no email given: both roles land on home after registration
   } catch (e) { next(e); }
 });
 
@@ -112,6 +113,12 @@ router.post('/signin', async (req, res, next) => {
       req.session.flash = { type: 'err', msg: t('invalidLogin') };
       req.session.loginAttempt = login; // keep what they typed
       return res.redirect('/signin');
+    }
+    // Verify first: an unverified email cannot sign in yet (no-email accounts pass through)
+    if (user.email && !user.email_verified) {
+      req.session.pendingVerificationEmail = user.email;
+      req.session.flash = { type: 'err', msg: t('verifyFirst') };
+      return res.redirect('/verify-email');
     }
     req.session.userId = user.id;
     if (user.role === 'admin') return res.redirect('/admin');
@@ -226,6 +233,33 @@ if (googleEnabled && passport) {
 }
 
 // Email verification: user taps the link from the verification email
+// Verify-first page: shown after signup instead of home
+router.get('/verify-email', (req, res) => {
+  res.render('auth/verify-email', { title: res.locals.t('verifyEmailTitle'), email: req.session.pendingVerificationEmail || '' });
+});
+
+// Public resend (for users not logged in yet)
+router.post('/verify-email/resend', async (req, res, next) => {
+  try {
+    const t = res.locals.t;
+    const email = (req.body.email || req.session.pendingVerificationEmail || '').trim().toLowerCase();
+    if (email) {
+      const r = await db.query('SELECT id, email_verified FROM users WHERE email=$1', [email]);
+      if (r.rows.length && !r.rows[0].email_verified) {
+        const token = crypto.randomBytes(32).toString('hex');
+        await db.query('UPDATE users SET email_token=$1 WHERE id=$2', [token, r.rows[0].id]);
+        const { sendVerificationEmail, mailerEnabled, BASE_URL } = require('../lib/mailer');
+        if (mailerEnabled()) {
+          try { await sendVerificationEmail(email, `${BASE_URL}/verify-email/${token}`); }
+          catch (e) { console.error('[mailer] resend failed:', e.message); }
+        }
+      }
+    }
+    req.session.flash = { type: 'ok', msg: t('checkInbox') };
+    res.redirect('/verify-email');
+  } catch (e) { next(e); }
+});
+
 router.get('/verify-email/:token', async (req, res, next) => {
   try {
     const t = res.locals.t;
@@ -235,8 +269,11 @@ router.get('/verify-email/:token', async (req, res, next) => {
       return res.redirect(req.session.userId ? '/' : '/signin');
     }
     await db.query('UPDATE users SET email_verified=TRUE, email_token=NULL WHERE id=$1', [r.rows[0].id]);
+    delete req.session.pendingVerificationEmail;
     req.session.flash = { type: 'ok', msg: t('emailVerified') };
-    res.redirect(req.session.userId ? '/' : '/signin');
+    if (req.session.userId) return res.redirect('/');
+    req.session.userId = r.rows[0].id; // verified → log them in, then onboarding
+    res.redirect('/welcome');
   } catch (e) { next(e); }
 });
 
