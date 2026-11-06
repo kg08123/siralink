@@ -1,6 +1,9 @@
 <h1 class="page-title"><%= t('applyNow') %></h1>
 <p class="sub"><%= job.title %> · <%= job.company_name %>
   <% if (job.verified) { %><span class="badge-verified">✓ <%= t('verified') %></span><% } %></p>
+<% if (typeof freeAppliesLeft !== 'undefined') { %>
+  <p class="sub" style="color:var(--green);font-weight:700">🎁 <%= t('freeAppliesLeft').replace('{n}', String(freeAppliesLeft)) %></p>
+<% } %>
 
 <form method="post" action="/f/apply/<%= job.id %>" enctype="multipart/form-data">
   <div class="field">

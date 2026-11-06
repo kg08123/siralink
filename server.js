@@ -26,6 +26,8 @@ if (process.env.DATABASE_URL && !process.env.USE_PGMEM) {
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMPTZ`))
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS gender TEXT`))
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS age INT`))
+    .then(() => db.query(`ALTER TABLE payments ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'job_post'`))
+    .then(() => db.query(`ALTER TABLE payments ADD COLUMN IF NOT EXISTS freelancer_user_id INT REFERENCES users(id) ON DELETE CASCADE`))
     .then(() => console.log('email verification columns ensured'))
     .then(async () => {
       // One-time demo seed (only when users table is empty)

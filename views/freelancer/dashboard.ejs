@@ -13,6 +13,11 @@
   <div class="box"><b><%= counts.total %></b><small><%= t('myApplications') %></small></div>
   <div class="box"><b><%= counts.pending %></b><small><%= t('pending') %></small></div>
 </div>
+<% if (applyUnlocked) { %>
+  <p class="sub" style="color:var(--green);font-weight:700">🔓 <%= t('applyUnlocked') %></p>
+<% } else { %>
+  <p class="sub" style="color:var(--green);font-weight:700">🎁 <%= t('freeAppliesLeft').replace('{n}', String(freeAppliesLeft)) %></p>
+<% } %>
 
 <div class="tabs">
   <a href="/f/applications"><%= t('myApplications') %></a>

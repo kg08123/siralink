@@ -58,6 +58,8 @@ CREATE TABLE IF NOT EXISTS payments (
   job_id INT UNIQUE REFERENCES jobs(id) ON DELETE CASCADE,
   receipt_path TEXT,
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected')),
+  type TEXT DEFAULT 'job_post' CHECK (type IN ('job_post','apply_unlock')),
+  freelancer_user_id INT REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

@@ -49,9 +49,14 @@ router.post('/verifications/:id/:action', async (req, res, next) => {
 router.get('/payments', async (req, res, next) => {
   try {
     const r = await db.query(
-      `SELECT p.id, p.receipt_path, p.status, p.created_at, j.id AS job_id, j.title,
-              c.company_name, c.user_id AS company_user_id
-       FROM payments p JOIN jobs j ON j.id=p.job_id JOIN companies c ON c.id=j.company_id
+      `SELECT p.id, p.receipt_path, p.status, p.created_at, p.type, p.freelancer_user_id,
+              j.id AS job_id, j.title,
+              c.company_name, c.user_id AS company_user_id,
+              u.name AS freelancer_name
+       FROM payments p
+       LEFT JOIN jobs j ON j.id=p.job_id
+       LEFT JOIN companies c ON c.id=j.company_id
+       LEFT JOIN users u ON u.id=p.freelancer_user_id
        WHERE p.status='pending' ORDER BY p.created_at DESC`);
     res.render('admin/payments', { title: res.locals.t('paymentReceipts'), payments: r.rows });
   } catch (e) { next(e); }
@@ -60,11 +65,14 @@ router.get('/payments', async (req, res, next) => {
 router.post('/payments/:id/:action', async (req, res, next) => {
   try {
     const ok = req.params.action === 'approve';
-    const p = await db.query('SELECT job_id FROM payments WHERE id=$1', [req.params.id]);
+    const p = await db.query('SELECT job_id, type FROM payments WHERE id=$1', [req.params.id]);
     if (!p.rows.length) return res.status(404).render('404');
     await db.query('UPDATE payments SET status=$1 WHERE id=$2', [ok ? 'approved' : 'rejected', req.params.id]);
-    await db.query('UPDATE jobs SET payment_status=$1, published=$2 WHERE id=$3',
-      [ok ? 'approved' : 'rejected', ok, p.rows[0].job_id]);
+    if (p.rows[0].job_id) {
+      await db.query('UPDATE jobs SET payment_status=$1, published=$2 WHERE id=$3',
+        [ok ? 'approved' : 'rejected', ok, p.rows[0].job_id]);
+    }
+    // apply_unlock payments need no job update — approval itself unlocks the freelancer
     res.redirect('/admin/payments');
   } catch (e) { next(e); }
 });

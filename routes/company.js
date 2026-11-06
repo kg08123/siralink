@@ -10,6 +10,7 @@ router.use(requireRole('company'));
 
 const POST_FEE = Number(process.env.JOB_POST_FEE_ETB || 99);
 const TELEBIRR_NUMBER = process.env.TELEBIRR_NUMBER || '0911 23 45 67';
+const FREE_JOB_POSTS = Number(process.env.FREE_JOB_POSTS || 3);
 
 // Dashboard
 router.get('/dashboard', async (req, res, next) => {
@@ -23,6 +24,7 @@ router.get('/dashboard', async (req, res, next) => {
     res.render('company/dashboard', {
       title: res.locals.t('dashboard'), company: co,
       jobStats: jobs.rows[0], appCount: apps.rows[0].total, totalLikes: likes.rows[0].n,
+      freePostsLeft: Math.max(0, FREE_JOB_POSTS - Number(jobs.rows[0].total)),
     });
   } catch (e) { next(e); }
 });
@@ -37,7 +39,9 @@ router.get('/post', async (req, res, next) => {
     const cr = await db.query(`SELECT DISTINCT city FROM jobs WHERE city IS NOT NULL AND city <> '' ORDER BY city`);
     const known = new Set(CITIES.map((c) => c[0]));
     const dbCities = cr.rows.map((x) => x.city).filter((c) => !known.has(c));
-    res.render('company/post1', { title: res.locals.t('postJob'), dbCities });
+    const jc = await db.query('SELECT COUNT(*)::int AS n FROM jobs WHERE company_id=$1', [req.company.id]);
+    res.render('company/post1', { title: res.locals.t('postJob'), dbCities,
+      freePostsLeft: Math.max(0, FREE_JOB_POSTS - jc.rows[0].n), fee: POST_FEE });
   } catch (e) { next(e); }
 });
 
@@ -64,6 +68,13 @@ router.post('/post', async (req, res, next) => {
        (city || '').trim() || null, budget_etb ? Number(budget_etb) : null,
        ['daily','monthly','yearly','once'].includes(pay_type) ? pay_type : 'monthly',
        (description || '').trim() || null, docs.join(', ')]);
+    // Free trial: first FREE_JOB_POSTS posts are free — publish immediately, no payment
+    const jc = await db.query('SELECT COUNT(*)::int AS n FROM jobs WHERE company_id=$1', [req.company.id]);
+    if (jc.rows[0].n <= FREE_JOB_POSTS) {
+      await db.query("UPDATE jobs SET payment_status='approved', published=TRUE WHERE id=$1", [r.rows[0].id]);
+      req.session.flash = { type: 'ok', msg: t('freePostUsed').replace('{n}', String(jc.rows[0].n)) };
+      return res.redirect('/c/jobs');
+    }
     req.session.flash = { type: 'ok', msg: t('jobPosted') };
     res.redirect('/c/post/payment/' + r.rows[0].id);
   } catch (e) { next(e); }
@@ -74,6 +85,7 @@ router.get('/post/payment/:jobId', async (req, res, next) => {
   try {
     const r = await db.query('SELECT * FROM jobs WHERE id=$1 AND company_id=$2', [req.params.jobId, req.company.id]);
     if (!r.rows.length) return res.status(404).render('404');
+    if (r.rows[0].payment_status === 'approved') return res.redirect('/c/jobs'); // free post or already paid
     const p = await db.query('SELECT * FROM payments WHERE job_id=$1', [req.params.jobId]);
     res.render('company/post2', {
       title: res.locals.t('payment'), job: r.rows[0],

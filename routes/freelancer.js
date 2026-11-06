@@ -7,6 +7,18 @@ const router = express.Router();
 
 router.use(requireRole('freelancer'));
 
+const FREE_APPLICATIONS = Number(process.env.FREE_APPLICATIONS || 10);
+const APPLY_UNLOCK_FEE = Number(process.env.APPLY_UNLOCK_FEE_ETB || 99);
+const TELEBIRR_NUMBER = process.env.TELEBIRR_NUMBER || '0911 23 45 67';
+
+// Free trial: { count, left, unlocked } for this freelancer
+async function applyTrial(userId) {
+  const c = await db.query('SELECT COUNT(*)::int AS n FROM applications WHERE freelancer_user_id=$1', [userId]);
+  const u = await db.query(
+    "SELECT id FROM payments WHERE type='apply_unlock' AND freelancer_user_id=$1 AND status='approved'", [userId]);
+  return { count: c.rows[0].n, left: Math.max(0, FREE_APPLICATIONS - c.rows[0].n), unlocked: u.rows.length > 0 };
+}
+
 // Dashboard
 router.get('/dashboard', async (req, res, next) => {
   try {
@@ -19,9 +31,11 @@ router.get('/dashboard', async (req, res, next) => {
       `SELECT SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) AS pending,
               SUM(CASE WHEN status='accepted' THEN 1 ELSE 0 END) AS accepted,
               COUNT(*) AS total FROM applications WHERE freelancer_user_id=$1`, [req.user.id]);
+    const trial = await applyTrial(req.user.id);
     res.render('freelancer/dashboard', {
       title: res.locals.t('dashboard'),
       profile: f.rows[0] || {}, apps: apps.rows, counts: counts.rows[0],
+      freeAppliesLeft: trial.left, applyUnlocked: trial.unlocked,
     });
   } catch (e) { next(e); }
 });
@@ -40,8 +54,14 @@ router.get('/apply/:jobId', async (req, res, next) => {
       req.session.flash = { type: 'err', msg: t('alreadyApplied') };
       return res.redirect('/jobs/' + req.params.jobId);
     }
+    // Free trial: 10 free applications, then unlock with a one-time payment
+    const trial = await applyTrial(req.user.id);
+    if (trial.left <= 0 && !trial.unlocked) {
+      req.session.flash = { type: 'err', msg: t('applyUnlockBody').replace('{fee}', String(APPLY_UNLOCK_FEE)) };
+      return res.redirect('/f/apply-payment');
+    }
     const docs = (r.rows[0].required_docs || '').split(',').map((s) => s.trim()).filter(Boolean);
-    res.render('freelancer/apply', { title: t('applyNow'), job: r.rows[0], docs });
+    res.render('freelancer/apply', { title: t('applyNow'), job: r.rows[0], docs, freeAppliesLeft: trial.left });
   } catch (e) { next(e); }
 });
 
@@ -56,6 +76,12 @@ router.post('/apply/:jobId', upload.array('documents', 10), async (req, res, nex
     if (already.rows.length) {
       req.session.flash = { type: 'err', msg: t('alreadyApplied') };
       return res.redirect('/jobs/' + req.params.jobId);
+    }
+    // Free trial gate (same as the form page — blocks direct POSTs too)
+    const trial = await applyTrial(req.user.id);
+    if (trial.left <= 0 && !trial.unlocked) {
+      req.session.flash = { type: 'err', msg: t('applyUnlockBody').replace('{fee}', String(APPLY_UNLOCK_FEE)) };
+      return res.redirect('/f/apply-payment');
     }
     const docs = (r.rows[0].required_docs || '').split(',').map((s) => s.trim()).filter(Boolean);
     const a = await db.query(
@@ -83,6 +109,45 @@ router.post('/apply/:jobId', upload.array('documents', 10), async (req, res, nex
     } catch (ne) { console.error('notify on apply failed:', ne.message); }
     req.session.flash = { type: 'ok', msg: t('applicationSent') };
     res.redirect('/f/applications');
+  } catch (e) { next(e); }
+});
+
+// Unlock unlimited applications — one-time payment (telebirr receipt + admin approval)
+router.get('/apply-payment', async (req, res, next) => {
+  try {
+    const trial = await applyTrial(req.user.id);
+    if (trial.unlocked) return res.redirect('/f/applications');
+    const p = await db.query(
+      "SELECT * FROM payments WHERE type='apply_unlock' AND freelancer_user_id=$1 ORDER BY created_at DESC LIMIT 1", [req.user.id]);
+    res.render('freelancer/apply-payment', {
+      title: res.locals.t('applyUnlockTitle'),
+      payment: p.rows[0] || null, fee: APPLY_UNLOCK_FEE, telebirr: TELEBIRR_NUMBER,
+      freeAppliesLeft: trial.left,
+    });
+  } catch (e) { next(e); }
+});
+
+router.post('/apply-payment', upload.single('receipt'), async (req, res, next) => {
+  try {
+    const t = res.locals.t;
+    const trial = await applyTrial(req.user.id);
+    if (trial.unlocked) return res.redirect('/f/applications');
+    if (!req.file) {
+      req.session.flash = { type: 'err', msg: t('uploadReceipt') };
+      return res.redirect('/f/apply-payment');
+    }
+    const existing = await db.query(
+      "SELECT id FROM payments WHERE type='apply_unlock' AND freelancer_user_id=$1", [req.user.id]);
+    if (existing.rows.length) {
+      await db.query("UPDATE payments SET receipt_path=$1, status='pending' WHERE id=$2",
+        ['/uploads/' + req.file.filename, existing.rows[0].id]);
+    } else {
+      await db.query(
+        "INSERT INTO payments(type, freelancer_user_id, receipt_path, status) VALUES('apply_unlock',$1,$2,'pending')",
+        [req.user.id, '/uploads/' + req.file.filename]);
+    }
+    req.session.flash = { type: 'ok', msg: t('unlockPaymentSubmitted') };
+    res.redirect('/f/apply-payment');
   } catch (e) { next(e); }
 });
 
