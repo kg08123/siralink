@@ -6,7 +6,7 @@
 <title>SiraLink — <%= typeof title !== 'undefined' ? title : t('appTag') %></title>
 <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body<%- typeof bodyClass !== 'undefined' && bodyClass ? ' class="' + bodyClass + '"' : '' %>>
 <header class="topbar">
   <div class="topbar-in">
     <a class="logo" href="/"><span class="logo-mark">S</span>SiraLink</a>

@@ -180,6 +180,26 @@ async function main(opts = {}) {
     }
   }
 
+  // demo conversation (application 0 accepted) with a realistic thread, incl. one image
+  const app0 = await db.query('SELECT id FROM applications WHERE job_id=$1 AND freelancer_user_id=$2', [jobIds[0], freelancerIds[0]]);
+  const coUser = await db.query("SELECT id FROM users WHERE phone='0911222333'");
+  const conv = await db.query(
+    'INSERT INTO conversations(job_id, application_id, company_user_id, freelancer_user_id) VALUES($1,$2,$3,$4) RETURNING id',
+    [jobIds[0], app0.rows[0].id, coUser.rows[0].id, freelancerIds[0]]);
+  const demoImg = 'data:image/png;base64,' + fs.readFileSync(path.join(uploadsDir, 'seed-receipt.png')).toString('base64');
+  const demoMsgs = [
+    [freelancerIds[0], 'Hello! Thank you for accepting my application. I can start on Monday and deliver the 5-page site in 10 days.', null],
+    [coUser.rows[0].id, 'Great — welcome aboard. The menu page is the priority, and we need Amharic + English from the start.', null],
+    [freelancerIds[0], 'Understood. Here is the first draft of the homepage layout for your feedback — colours and menu are placeholders for now.', demoImg],
+    [coUser.rows[0].id, 'Looks clean! Can you make the menu bigger on phones? Most of our customers order from their phones. Also please check the reference site: https://www.example-restaurant-addis-bole-menu-and-reservations.com/menu', null],
+    [freelancerIds[0], 'Sure, I will make the menu full-width on small screens and test it on my phone before I send the next version.', null],
+    [coUser.rows[0].id, 'Perfect. Send the next version when ready and we will pay the first half via telebirr.', null],
+  ];
+  for (const [sender, body, img] of demoMsgs) {
+    await db.query('INSERT INTO messages(conversation_id, sender_user_id, body, image_data) VALUES($1,$2,$3,$4)',
+      [conv.rows[0].id, sender, body, img]);
+  }
+
   console.log('seeded OK');
   console.log(`admin login: phone=${ADMIN_PHONE} password=${ADMIN_PASS}`);
   console.log('demo password for all other users: password123');

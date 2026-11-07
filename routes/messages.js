@@ -108,7 +108,7 @@ router.get('/:id', requireAuth, async (req, res, next) => {
       `SELECT m.id, m.body, m.created_at, m.sender_user_id, m.image_data, u.name AS sender_name
        FROM messages m JOIN users u ON u.id=m.sender_user_id
        WHERE m.conversation_id=$1 ORDER BY m.id ASC LIMIT 100`, [conv.id]);
-    res.render('messages-thread', { title: conv.other_name, conv, messages: m.rows });
+    res.render('messages-thread', { title: conv.other_name, conv, messages: m.rows, bodyClass: 'chat-page' });
   } catch (e) { next(e); }
 });
 
