@@ -13,7 +13,8 @@ body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans 
 .topbar{position:sticky; top:0; z-index:50; background:var(--card); border-bottom:1px solid var(--line)}
 .topbar-in{max-width:640px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:10px}
 .logo{display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--green); font-weight:800; font-size:1.25rem}
-.logo-mark{width:34px; height:34px; border-radius:10px; background:var(--green); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900}
+.logo-mark{width:34px; height:34px; border-radius:10px; background:var(--green); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; position:relative}
+.logo-link{position:absolute; right:.1em; bottom:.1em; width:.68em; height:.68em}
 .navlinks{margin-left:auto; display:flex; align-items:center; gap:10px; font-size:.9rem}
 .navlinks a{color:var(--ink); text-decoration:none; font-weight:600}
 .lang-toggle{display:flex; background:#eef1ee; border-radius:999px; padding:2px; font-size:.8rem; font-weight:700}
