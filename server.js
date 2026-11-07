@@ -26,6 +26,7 @@ if (process.env.DATABASE_URL && !process.env.USE_PGMEM) {
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMPTZ`))
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS gender TEXT`))
     .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS age INT`))
+    .then(() => db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS notify_platform BOOLEAN DEFAULT TRUE`))
     .then(() => db.query(`ALTER TABLE payments ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'job_post'`))
     .then(() => db.query(`ALTER TABLE payments ADD COLUMN IF NOT EXISTS freelancer_user_id INT REFERENCES users(id) ON DELETE CASCADE`))
     .then(() => console.log('email verification columns ensured'))
@@ -109,7 +110,7 @@ app.use(async (req, res, next) => {
   req.company = null;
   if (req.session.userId) {
     try {
-      const r = await db.query('SELECT id, role, name, phone, email, email_verified FROM users WHERE id=$1', [req.session.userId]);
+      const r = await db.query('SELECT id, role, name, phone, email, email_verified, notify_platform FROM users WHERE id=$1', [req.session.userId]);
       if (r.rows.length) {
         req.user = r.rows[0];
         if (req.user.role === 'company') {
@@ -136,9 +137,11 @@ app.use(async (req, res, next) => {
       res.locals.unreadCount = u.rows[0].n;
     } catch (e) { /* tables may not exist on first boot */ }
     try {
+      // Announcements don't count when the user turned them off in Settings
+      const showAnn = req.user.notify_platform !== false;
       const n = await db.query(
-        'SELECT COUNT(*)::int AS n FROM notifications WHERE user_id=$1 AND is_read=FALSE',
-        [req.user.id]);
+        "SELECT COUNT(*)::int AS n FROM notifications WHERE user_id=$1 AND is_read=FALSE AND (kind <> 'announcement' OR $2)",
+        [req.user.id, showAnn]);
       res.locals.unreadCount += n.rows[0].n;
     } catch (e) { /* table may not exist on first boot */ }
   }
@@ -183,6 +186,7 @@ app.use((req, res, next) => {
 
 app.use('/messages', require('./routes/messages'));
 app.use('/support', require('./routes/support'));
+app.use('/settings', require('./routes/settings'));
 app.use('/', require('./routes/index'));
 app.use('/', require('./routes/auth'));
 app.use('/f', require('./routes/freelancer'));

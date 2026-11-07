@@ -1,0 +1,9 @@
+<p><a href="/messages">← <%= t('back') %></a></p>
+<h1 class="page-title"><%= nt(notif.title) %></h1>
+<p class="sub"><%= new Date(notif.created_at).toLocaleString() %></p>
+<div class="section">
+  <p style="white-space:pre-wrap;word-break:break-word;margin:0"><%= nt(notif.body) %></p>
+</div>
+<% if (notif.link && notif.link !== '/messages' && notif.link !== '/') { %>
+  <a class="btn btn-green" style="width:100%" href="<%= notif.link %>"><%= t('viewMessage') %></a>
+<% } %>

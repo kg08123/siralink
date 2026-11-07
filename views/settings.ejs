@@ -1,0 +1,43 @@
+<h1 class="page-title"><%= t('settings') %></h1>
+
+<div class="section">
+  <h2><%= t('accountInfo') %></h2>
+  <table class="data kv">
+    <tr><th><%= t('name') %></th><td><%= account.name %></td></tr>
+    <tr><th><%= t('phone') %></th><td><%= account.phone %></td></tr>
+    <tr><th><%= t('email') %></th><td><%= account.email || '—' %></td></tr>
+    <tr><th><%= t('role') %></th><td><%= account.role === 'freelancer' ? t('freelancer') : account.role === 'company' ? t('company') : t('admin') %></td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h2><%= t('language') %></h2>
+  <form method="post" action="/settings/language">
+    <div class="toggle2">
+      <button type="submit" name="lang" value="en" class="<%= lang==='en'?'on':'' %>">English</button>
+      <button type="submit" name="lang" value="am" class="<%= lang==='am'?'on':'' %>">አማርኛ</button>
+    </div>
+  </form>
+</div>
+
+<div class="section">
+  <h2><%= t('platformNotifications') %></h2>
+  <p class="sub"><%= t('platformNotifDesc') %></p>
+  <form method="post" action="/settings/notifications">
+    <label class="check">
+      <input type="checkbox" name="notify_platform" value="on" <%= account.notify_platform !== false ? 'checked' : '' %>>
+      <%= t('platformNotifications') %>
+    </label>
+    <button class="btn btn-green" type="submit"><%= t('save') %></button>
+  </form>
+</div>
+
+<div class="section">
+  <h2><%= t('changePassword') %></h2>
+  <form method="post" action="/settings/password">
+    <div class="field"><label><%= t('currentPassword') %></label><input type="password" name="current" required></div>
+    <div class="field"><label><%= t('newPassword') %></label><input type="password" name="password" required></div>
+    <div class="field"><label><%= t('confirmPassword') %></label><input type="password" name="password2" required></div>
+    <button class="btn btn-green" type="submit"><%= t('changePassword') %></button>
+  </form>
+</div>

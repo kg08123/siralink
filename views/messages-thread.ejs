@@ -11,8 +11,9 @@
 </div>
 <div id="imgPrev" class="img-prev" hidden>
   <img id="imgPrevImg" alt="">
-  <button type="button" id="imgRm" class="btn btn-red btn-sm"><%= t('removeImage') %></button>
+  <button type="button" id="imgRm" class="img-prev-x" aria-label="<%= t('removeImage') %>"><%- icon('x') %></button>
 </div>
+<div id="imgErr" class="img-prev-err" hidden></div>
 <form id="sendform" method="post" action="/messages/<%= conv.id %>" class="chatbar" enctype="multipart/form-data">
   <button type="button" class="icon-btn" id="imgBtn" aria-label="<%= t('chooseImage') %>"><%- icon('image') %></button>
   <input type="file" id="imgInput" name="image" accept="image/*" hidden>
@@ -53,10 +54,29 @@
   var imgInput=document.getElementById('imgInput'), imgFile=null;
   document.getElementById('imgBtn').addEventListener('click',function(){ imgInput.click(); });
   imgInput.addEventListener('change',function(){
+    var pv=document.getElementById('imgPrev'), err=document.getElementById('imgErr');
     imgFile=imgInput.files[0]||null;
-    var pv=document.getElementById('imgPrev');
-    if(imgFile){ document.getElementById('imgPrevImg').src=URL.createObjectURL(imgFile); pv.hidden=false; }
-    else pv.hidden=true;
+    if(err) err.hidden=true;
+    if(!imgFile){ pv.hidden=true; return; }
+    if(imgFile.type.indexOf('image/')!==0){
+      imgInput.value=''; imgFile=null; pv.hidden=true;
+      if(err){ err.textContent='<%= t('imageOnly') %>'; err.hidden=false; }
+      return;
+    }
+    if(imgFile.size>3*1024*1024){
+      imgInput.value=''; imgFile=null; pv.hidden=true;
+      if(err){ err.textContent='<%= t('imageTooBig') %>'; err.hidden=false; }
+      return;
+    }
+    // FileReader data URL: renders reliably in phone WebViews where blob object URLs can stay blank
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var im=document.getElementById('imgPrevImg');
+      im.onerror=function(){ pv.hidden=true; if(err){ err.textContent='<%= t('imageOnly') %>'; err.hidden=false; } };
+      im.src=e.target.result;
+      pv.hidden=false;
+    };
+    reader.readAsDataURL(imgFile);
   });
   document.getElementById('imgRm').addEventListener('click',function(){
     imgInput.value=''; imgFile=null; document.getElementById('imgPrev').hidden=true;

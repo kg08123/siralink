@@ -126,13 +126,8 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 /* --- SiraLink UI refresh: header, likes, filter panel, icons --- */
 .btn-signin{background:var(--green);color:#fff!important;font-weight:800;padding:10px 22px;border-radius:999px;text-decoration:none;box-shadow:0 2px 10px rgba(11,107,63,.35);white-space:nowrap}
 .btn-signin:hover{background:var(--green-dark)}
-.menu-wrap{position:relative}
 .hamb{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
 .hamb .ico{width:22px;height:22px}
-.menu-drop{position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.14);min-width:200px;z-index:200;padding:6px;display:flex;flex-direction:column}
-.menu-drop[hidden]{display:none}
-.menu-drop a{padding:12px 14px;border-radius:10px;font-weight:600}
-.menu-drop a:hover{background:#f3f4f6}
 .ico{width:18px;height:18px;flex:0 0 auto;vertical-align:-3px}
 .icon-btn{display:flex;align-items:center;justify-content:center}
 .icon-btn .ico{width:22px;height:22px}
@@ -204,8 +199,12 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .or-row{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:.85rem}
 .or-row::before,.or-row::after{content:'';flex:1;height:1px;background:var(--line)}
 .chat-img{max-width:230px;max-height:230px;border-radius:10px;display:block;margin-bottom:6px}
-.img-prev{display:flex;align-items:center;gap:10px;margin:8px 0}
-.img-prev img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+/* Chat image preview: thumbnail with a small circular X on its top-right corner */
+.img-prev{position:relative;display:inline-block;margin:8px 0}
+.img-prev img{width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--line);display:block}
+.img-prev-x{position:absolute;top:-8px;right:-8px;width:26px;height:26px;border-radius:50%;border:none;background:#1a1a1a;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.img-prev-x .ico{width:14px;height:14px}
+.img-prev-err{color:var(--red);font-size:.82rem;font-weight:600;margin:4px 0}
 .chat-item.unread{border-color:var(--green);background:var(--green-soft)}
 .bubble p{margin:0 0 2px;word-break:break-word}
 
@@ -231,3 +230,28 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
   .stat3{gap:8px}
   .stat3 .box{padding:10px 6px}
 }
+
+/* --- Slide-in menu drawer (replaces the old dropdown) --- */
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200}
+.drawer-backdrop[hidden]{display:none}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(320px,85vw);background:#fff;z-index:201;box-shadow:-8px 0 30px rgba(0,0,0,.18);transform:translateX(105%);transition:transform .28s ease;display:flex;flex-direction:column}
+.drawer.open{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;gap:12px;padding:18px 16px;border-bottom:1px solid var(--line);background:var(--green-soft)}
+.drawer-avatar{width:48px;height:48px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex:0 0 auto}
+.drawer-head .grow{flex:1;min-width:0}
+.drawer-head b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drawer-close{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink);flex:0 0 auto}
+.drawer-nav{display:flex;flex-direction:column;padding:10px;gap:2px;overflow-y:auto}
+.drawer-nav a{display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:10px;font-weight:600;color:var(--ink);text-decoration:none}
+.drawer-nav a:hover{background:#f3f4f6}
+.drawer-nav a .ico{width:20px;height:20px;color:var(--green)}
+.drawer-nav a.danger{color:var(--red)}
+.drawer-nav a.danger .ico{color:var(--red)}
+.footer a{color:var(--green);text-decoration:none;font-weight:600}
+
+/* --- Chats search (inbox) --- */
+.section-head{display:flex;align-items:center;gap:10px;margin:18px 2px 10px}
+.section-head .section-title{margin:0;flex:0 0 auto}
+.chat-search{flex:1;max-width:230px;margin-left:auto;display:flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:7px 12px}
+.chat-search .ico{width:16px;height:16px;color:var(--muted)}
+.chat-search input{border:none;outline:none;flex:1;min-width:0;font-size:.9rem;font-family:inherit;background:transparent;padding:0}

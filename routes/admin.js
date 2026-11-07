@@ -168,7 +168,7 @@ router.post('/announcements', async (req, res, next) => {
     const inList = roles.map((r) => `'${r}'`).join(',');
     const r = await db.query(
       `INSERT INTO notifications(user_id, kind, title, body, link)
-       SELECT id, 'announcement', $1, $2, '/' FROM users WHERE role IN (${inList})
+       SELECT id, 'announcement', $1, $2, '/' FROM users WHERE role IN (${inList}) AND (notify_platform IS NULL OR notify_platform = TRUE)
        RETURNING id`,
       [JSON.stringify({ k: '__raw', text: title }), JSON.stringify({ k: '__raw', text: body })]
     );

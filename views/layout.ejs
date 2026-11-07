@@ -13,21 +13,7 @@
     <nav class="navlinks">
       <% if (user) { %>
         <a class="msg-ico" href="/messages" aria-label="<%= t('messages') %>"><%- icon('comment') %><% if (unreadCount > 0) { %><span class="badge"><%= unreadCount > 99 ? '99+' : unreadCount %></span><% } %></a>
-        <div class="menu-wrap">
-          <button class="hamb" id="menuBtn" aria-label="menu" aria-haspopup="true"><%- icon('menu') %></button>
-          <div class="menu-drop" id="menuDrop" hidden>
-            <% if (user.role === 'freelancer') { %>
-              <a href="/f/dashboard"><%= t('dashboard') %></a>
-              <a href="/f/applications"><%= t('myApplications') %></a>
-            <% } else if (user.role === 'company') { %>
-              <a href="/c/dashboard"><%= t('dashboard') %></a>
-              <a href="/c/jobs"><%= t('myJobs') %></a>
-              <a href="/c/post"><%= t('postJob') %></a>
-            <% } %>
-            <a href="/support"><%= t('support') %></a>
-            <a href="/signout"><%= t('signOut') %></a>
-          </div>
-        </div>
+        <button class="hamb" id="menuBtn" aria-label="menu"><%- icon('menu') %></button>
       <% } else { %>
         <a class="btn-signin" href="/signin"><%= t('signIn') %></a>
       <% } %>
@@ -37,19 +23,54 @@
     </nav>
   </div>
 </header>
+<% if (user) { %>
+<div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+<aside class="drawer" id="drawer" aria-label="menu">
+  <div class="drawer-head">
+    <div class="drawer-avatar"><%= user.name ? user.name.trim()[0].toUpperCase() : 'S' %></div>
+    <div class="grow">
+      <b><%= user.name %></b>
+      <span class="sub" style="margin:0"><%= user.role === 'freelancer' ? t('freelancer') : user.role === 'company' ? t('company') : t('admin') %></span>
+    </div>
+    <button class="icon-btn drawer-close" id="drawerClose" aria-label="close"><%- icon('x') %></button>
+  </div>
+  <nav class="drawer-nav">
+    <% if (user.role === 'freelancer') { %>
+      <a href="/f/dashboard"><%- icon('grid') %><%= t('dashboard') %></a>
+      <a href="/f/applications"><%- icon('file') %><%= t('myApplications') %></a>
+    <% } else if (user.role === 'company') { %>
+      <a href="/c/dashboard"><%- icon('grid') %><%= t('dashboard') %></a>
+      <a href="/c/jobs"><%- icon('file') %><%= t('myJobs') %></a>
+      <a href="/c/post"><%- icon('send') %><%= t('postJob') %></a>
+    <% } else { %>
+      <a href="/admin"><%- icon('grid') %><%= t('adminPanel') %></a>
+    <% } %>
+    <a href="/messages"><%- icon('comment') %><%= t('messages') %></a>
+    <a href="/support"><%- icon('help') %><%= t('support') %></a>
+    <a href="/settings"><%- icon('settings') %><%= t('settings') %></a>
+    <a href="/about"><%- icon('info') %><%= t('aboutUs') %></a>
+    <a href="/signout" class="danger"><%- icon('logout') %><%= t('signOut') %></a>
+  </nav>
+</aside>
+<% } %>
 <main class="wrap">
   <% if (flash) { %><div class="flash <%= flash.type %>"><%= flash.msg %></div><% } %>
   <%- body %>
 </main>
-<footer class="footer">SiraLink · <%= t('appTag') %> · Addis Ababa, Ethiopia</footer>
+<footer class="footer">SiraLink · <%= t('appTag') %> · Addis Ababa, Ethiopia<br><a href="/about"><%= t('aboutUs') %></a> · <a href="/support"><%= t('support') %></a></footer>
 <script>
 function copyNum(id){const el=document.getElementById(id);if(!el)return;navigator.clipboard&&navigator.clipboard.writeText(el.innerText.trim());}
-// Hamburger menu toggle
+// Slide-in drawer menu
 (function(){
-  var b=document.getElementById('menuBtn'), d=document.getElementById('menuDrop');
+  var b=document.getElementById('menuBtn'), d=document.getElementById('drawer'),
+      bg=document.getElementById('drawerBackdrop'), x=document.getElementById('drawerClose');
   if(!b||!d) return;
-  b.addEventListener('click', function(e){ e.stopPropagation(); d.hidden=!d.hidden; });
-  document.addEventListener('click', function(e){ if(!d.hidden && !d.contains(e.target)) d.hidden=true; });
+  function open(){ d.classList.add('open'); bg.hidden=false; document.body.style.overflow='hidden'; }
+  function close(){ d.classList.remove('open'); bg.hidden=true; document.body.style.overflow=''; }
+  b.addEventListener('click', function(e){ e.stopPropagation(); open(); });
+  if(x) x.addEventListener('click', close);
+  if(bg) bg.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
 })();
 // Like button toggle (no page reload)
 document.addEventListener('click', async function(e){

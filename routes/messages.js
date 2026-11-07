@@ -74,12 +74,27 @@ router.get('/', requireAuth, async (req, res, next) => {
       c.hasImage = lm.rows.length ? !!lm.rows[0].has_image : false;
       c.unread = await unreadFor(c.id, req.user.id);
     }
-    // Platform notifications (marked read on view), shown in the "Platform" section above chats
+    // Platform notifications (marked read on view), shown in the "Platform" section above chats.
+    // Users who turned announcements off in Settings don't see announcement-kind cards.
     const nr = await db.query(
       'SELECT * FROM notifications WHERE user_id=$1 ORDER BY created_at DESC LIMIT 100', [req.user.id]);
     await db.query('UPDATE notifications SET is_read=TRUE WHERE user_id=$1 AND is_read=FALSE', [req.user.id]);
+    const notifs = req.user.notify_platform === false
+      ? nr.rows.filter((n) => n.kind !== 'announcement')
+      : nr.rows;
     const su = await db.query("SELECT COUNT(*)::int AS n FROM support_messages WHERE user_id=$1 AND sender='admin' AND is_read=FALSE", [req.user.id]);
-    res.render('messages-inbox', { title: res.locals.t('messages'), convs, notifs: nr.rows, supportUnread: su.rows[0].n });
+    res.render('messages-inbox', { title: res.locals.t('messages'), convs, notifs, supportUnread: su.rows[0].n });
+  } catch (e) { next(e); }
+});
+
+// Platform message detail: full text of one platform notification
+router.get('/platform/:id', requireAuth, async (req, res, next) => {
+  try {
+    const r = await db.query(
+      'SELECT * FROM notifications WHERE id=$1 AND user_id=$2', [req.params.id, req.user.id]);
+    if (!r.rows.length) return res.status(404).render('404');
+    await db.query('UPDATE notifications SET is_read=TRUE WHERE id=$1', [req.params.id]);
+    res.render('platform-message', { title: res.locals.t('platformMessage'), notif: r.rows[0] });
   } catch (e) { next(e); }
 });
 

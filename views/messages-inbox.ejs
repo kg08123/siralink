@@ -10,7 +10,7 @@
 <h2 class="section-title"><%= t('platformTitle') %></h2>
 <% if (!notifs.length) { %><div class="empty"><%= t('noNotifications') %></div><% } %>
 <% notifs.forEach(function(n){ %>
-  <a class="chat-item <%= n.is_read ? '' : 'unread' %>" href="<%= n.link || '/messages' %>">
+  <a class="chat-item <%= n.is_read ? '' : 'unread' %>" href="/messages/platform/<%= n.id %>">
     <div class="grow">
       <div class="ci-top"><b><%= nt(n.title) %></b><% if (!n.is_read) { %><span class="badge">•</span><% } %></div>
       <div class="sub"><%= nt(n.body) %></div>
@@ -19,10 +19,14 @@
   </a>
 <% }) %>
 
-<h2 class="section-title"><%= t('chatsTitle') %></h2>
+<div class="section-head">
+  <h2 class="section-title"><%= t('chatsTitle') %></h2>
+  <label class="chat-search"><%- icon('search') %><input type="search" id="chatSearch" placeholder="<%= t('searchChats') %>" autocomplete="off"></label>
+</div>
+<div id="chatList">
 <% if (!convs.length) { %><div class="empty"><%= t('noConversations') %></div><% } %>
 <% convs.forEach(function(c){ %>
-  <div class="chat-item">
+  <div class="chat-item" data-search="<%= (c.other_name + ' ' + c.job_title + ' ' + (c.lastBody || '')).toLowerCase() %>">
     <a class="grow" href="/messages/<%= c.id %>" style="text-decoration:none;color:inherit">
       <div class="ci-top"><b><%= c.other_name %></b><% if (c.unread) { %><span class="badge"><%= c.unread %></span><% } %></div>
       <div class="sub"><%= c.job_title %></div>
@@ -35,3 +39,24 @@
     <% } %>
   </div>
 <% }) %>
+</div>
+<div class="empty" id="noChatMatch" hidden><%= t('noChatsMatch') %></div>
+<script>
+(function(){
+  var input=document.getElementById('chatSearch');
+  var list=document.getElementById('chatList');
+  var none=document.getElementById('noChatMatch');
+  if(!input||!list) return;
+  var items=Array.prototype.slice.call(list.querySelectorAll('.chat-item'));
+  input.addEventListener('input',function(){
+    var q=input.value.trim().toLowerCase();
+    var shown=0;
+    items.forEach(function(it){
+      var hit=!q || (it.getAttribute('data-search')||'').indexOf(q)!==-1;
+      it.style.display=hit?'':'none';
+      if(hit) shown++;
+    });
+    if(none) none.hidden=shown>0;
+  });
+})();
+</script>
