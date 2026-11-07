@@ -10,6 +10,7 @@ router.use(requireRole('company'));
 
 const POST_FEE = Number(process.env.JOB_POST_FEE_ETB || 99);
 const TELEBIRR_NUMBER = process.env.TELEBIRR_NUMBER || '0911 23 45 67';
+const CBE_NUMBER = process.env.CBE_NUMBER || '';
 const FREE_JOB_POSTS = Number(process.env.FREE_JOB_POSTS || 3);
 
 // Dashboard
@@ -94,7 +95,7 @@ router.get('/post/payment/:jobId', async (req, res, next) => {
     const p = await db.query('SELECT * FROM payments WHERE job_id=$1', [req.params.jobId]);
     res.render('company/post2', {
       title: res.locals.t('payment'), job: r.rows[0],
-      payment: p.rows[0] || null, fee: POST_FEE, telebirr: TELEBIRR_NUMBER,
+      payment: p.rows[0] || null, fee: POST_FEE, telebirr: TELEBIRR_NUMBER, cbe: CBE_NUMBER,
     });
   } catch (e) { next(e); }
 });

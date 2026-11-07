@@ -10,6 +10,7 @@ router.use(requireRole('freelancer'));
 const FREE_APPLICATIONS = Number(process.env.FREE_APPLICATIONS || 10);
 const APPLY_UNLOCK_FEE = Number(process.env.APPLY_UNLOCK_FEE_ETB || 99);
 const TELEBIRR_NUMBER = process.env.TELEBIRR_NUMBER || '0911 23 45 67';
+const CBE_NUMBER = process.env.CBE_NUMBER || '';
 
 // Free trial: { count, left, unlocked } for this freelancer
 async function applyTrial(userId) {
@@ -121,7 +122,7 @@ router.get('/apply-payment', async (req, res, next) => {
       "SELECT * FROM payments WHERE type='apply_unlock' AND freelancer_user_id=$1 ORDER BY created_at DESC LIMIT 1", [req.user.id]);
     res.render('freelancer/apply-payment', {
       title: res.locals.t('applyUnlockTitle'),
-      payment: p.rows[0] || null, fee: APPLY_UNLOCK_FEE, telebirr: TELEBIRR_NUMBER,
+      payment: p.rows[0] || null, fee: APPLY_UNLOCK_FEE, telebirr: TELEBIRR_NUMBER, cbe: CBE_NUMBER,
       freeAppliesLeft: trial.left,
     });
   } catch (e) { next(e); }
