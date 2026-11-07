@@ -69,6 +69,8 @@ body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans 
 .toggle2 button.on{background:var(--green); color:#fff; border-color:var(--green)}
 .upload-zone{border:2px dashed var(--amber); border-radius:14px; padding:26px 16px; text-align:center; background:var(--amber-soft); cursor:pointer}
 .upload-zone input{display:none}
+.receipt-prev{max-width:220px;max-height:220px;border-radius:12px;display:block;margin:12px auto 0}
+.receipt-prev[hidden]{display:none}
 .doc-row{display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px; flex-wrap:wrap; min-width:0}
 .doc-row .grow{flex:1; min-width:0}
 .doc-row input[type=file]{flex:1 1 100%; min-width:0; max-width:100%; font-size:.85rem}

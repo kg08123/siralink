@@ -19,10 +19,22 @@
     <label class="upload-zone">
       <div style="font-size:2rem">📤</div>
       <div style="font-weight:700"><%= t('uploadReceipt') %></div>
-      <input type="file" name="receipt" accept="image/*" required onchange="this.form.querySelector('.fname').textContent=this.files[0].name">
+      <input type="file" name="receipt" accept="image/*" required onchange="previewReceipt(this)">
       <div class="fname hint"></div>
+      <img class="receipt-prev" hidden alt="">
     </label>
     <p class="hint" style="margin-top:10px">⏳ <%= t('approvalNote') %></p>
     <button class="btn btn-green" type="submit" style="margin-top:8px"><%= t('submitForApproval') %></button>
   </form>
 </div>
+<script>
+function previewReceipt(input){
+  var f=input.files[0]; if(!f) return;
+  var form=input.form;
+  var nameEl=form.querySelector('.fname'); if(nameEl) nameEl.textContent=f.name;
+  var img=form.querySelector('.receipt-prev'); if(!img) return;
+  var reader=new FileReader();
+  reader.onload=function(e){ img.src=e.target.result; img.hidden=false; };
+  reader.readAsDataURL(f);
+}
+</script>

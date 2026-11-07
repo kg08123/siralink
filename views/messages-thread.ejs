@@ -28,6 +28,15 @@
   function addMsg(m){
     if(m.id<=lastId) return;
     lastId=m.id;
+    // A real copy of our own message arrived: drop the matching optimistic bubble
+    if(m.mine){
+      chat.querySelectorAll('.bubble.temp').forEach(function(t){
+        var tp=t.querySelector('p');
+        var tBody=tp?tp.textContent:'';
+        var tImg=!!t.querySelector('img');
+        if(tBody===(m.body||'') && tImg===!!m.has_image){ t.remove(); }
+      });
+    }
     var div=document.createElement('div');
     div.className='bubble '+(m.mine?'mine':'theirs');
     if(m.has_image&&m.image_data){
@@ -48,7 +57,7 @@
       d.messages.forEach(addMsg);
     }catch(e){}
   }
-  setInterval(poll,5000);
+  setInterval(poll,2000);
   var form=document.getElementById('sendform');
   var input=form.querySelector('input[name=body]');
   var imgInput=document.getElementById('imgInput'), imgFile=null;
@@ -88,6 +97,14 @@
     var fd=new FormData();
     fd.append('body',text);
     if(imgFile) fd.append('image',imgFile);
+    // Show the message instantly while the server saves it
+    var imgData=imgFile?document.getElementById('imgPrevImg').src:null;
+    var tmp=document.createElement('div');
+    tmp.className='bubble mine temp';
+    if(imgData){ var ta=document.createElement('a'); ta.href=imgData; ta.target='_blank'; ta.rel='noopener'; var tim=document.createElement('img'); tim.className='chat-img'; tim.src=imgData; ta.appendChild(tim); tmp.appendChild(ta); }
+    if(text){ var tp=document.createElement('p'); tp.textContent=text; tmp.appendChild(tp); }
+    var ts=document.createElement('small'); ts.textContent='Sending…'; tmp.appendChild(ts);
+    chat.appendChild(tmp); chat.scrollTop=chat.scrollHeight;
     input.value=''; imgInput.value=''; imgFile=null;
     document.getElementById('imgPrevImg').removeAttribute('src');
     document.getElementById('imgPrev').hidden=true;
