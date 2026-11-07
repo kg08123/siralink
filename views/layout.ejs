@@ -59,7 +59,7 @@
   <% if (flash) { %><div class="flash <%= flash.type %>"><%= flash.msg %></div><% } %>
   <%- body %>
 </main>
-<footer class="footer">SiraLink · <%= t('appTag') %> · Addis Ababa, Ethiopia<br><a href="/about"><%= t('aboutUs') %></a> · <a href="/support"><%= t('support') %></a></footer>
+<footer class="footer">SiraLink · <%= t('appTag') %> · Addis Ababa, Ethiopia<br><a href="/about"><%= t('aboutUs') %></a> · <a href="/support"><%= t('support') %></a> · <a href="/privacy"><%= t('privacyTitle') %></a></footer>
 <script>
 function copyNum(id){const el=document.getElementById(id);if(!el)return;navigator.clipboard&&navigator.clipboard.writeText(el.innerText.trim());}
 // Slide-in drawer menu

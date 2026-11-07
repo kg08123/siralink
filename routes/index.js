@@ -91,6 +91,10 @@ router.get('/about', (req, res) => {
   res.render('about', { title: res.locals.t('aboutTitle') });
 });
 
+router.get('/privacy', (req, res) => {
+  res.render('privacy', { title: res.locals.t('privacyTitle') });
+});
+
 // Welcome page: opened by tapping the welcome platform notification
 router.get('/welcome', requireAuth, (req, res) => {
   res.render('welcome', { title: res.locals.t('welcomePageTitle') });
