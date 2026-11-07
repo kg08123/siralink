@@ -152,3 +152,19 @@ CREATE TABLE IF NOT EXISTS support_messages (
   is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Indexes: faster lookups as jobs/users/messages grow (no UI or data change).
+-- Home feed + company job lists
+CREATE INDEX IF NOT EXISTS idx_jobs_published_created ON jobs (published, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_jobs_company ON jobs (company_id);
+-- Applied/comment counts on job cards
+CREATE INDEX IF NOT EXISTS idx_applications_job ON applications (job_id);
+CREATE INDEX IF NOT EXISTS idx_applications_freelancer ON applications (freelancer_user_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_company ON reviews (company_id);
+CREATE INDEX IF NOT EXISTS idx_job_likes_user ON job_likes (user_id);
+-- Chat inbox + thread polling
+CREATE INDEX IF NOT EXISTS idx_conversations_freelancer ON conversations (freelancer_user_id);
+CREATE INDEX IF NOT EXISTS idx_conversations_company ON conversations (company_user_id);
+CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages (conversation_id, id);
+-- Platform notifications
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications (user_id);
