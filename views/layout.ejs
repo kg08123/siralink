@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SiraLink — <%= typeof title !== 'undefined' ? title : t('appTag') %></title>
 <link rel="stylesheet" href="/css/style.css">
+<link rel="icon" type="image/png" href="/img/siralink-logo-64.png">
 </head>
 <body<%- typeof bodyClass !== 'undefined' && bodyClass ? ' class="' + bodyClass + '"' : '' %>>
 <header class="topbar">
   <div class="topbar-in">
-    <a class="logo" href="/"><span class="logo-mark">S<svg class="logo-link" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>SiraLink</a>
+    <a class="logo" href="/"><img class="logo-img" src="/img/siralink-logo.png" alt="SiraLink">SiraLink</a>
     <nav class="navlinks">
       <% if (user) { %>
         <a class="msg-ico" href="/messages" aria-label="<%= t('messages') %>"><%- icon('comment') %><% if (unreadCount > 0) { %><span class="badge"><%= unreadCount > 99 ? '99+' : unreadCount %></span><% } %></a>
