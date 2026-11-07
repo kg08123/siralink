@@ -79,7 +79,7 @@
     reader.readAsDataURL(imgFile);
   });
   document.getElementById('imgRm').addEventListener('click',function(){
-    imgInput.value=''; imgFile=null; document.getElementById('imgPrev').hidden=true;
+    imgInput.value=''; imgFile=null; document.getElementById('imgPrevImg').removeAttribute('src'); document.getElementById('imgPrev').hidden=true;
   });
   form.addEventListener('submit',function(e){
     e.preventDefault();
@@ -89,6 +89,7 @@
     fd.append('body',text);
     if(imgFile) fd.append('image',imgFile);
     input.value=''; imgInput.value=''; imgFile=null;
+    document.getElementById('imgPrevImg').removeAttribute('src');
     document.getElementById('imgPrev').hidden=true;
     fetch(form.action,{method:'POST',headers:{'X-Requested-With':'XMLHttpRequest'},body:fd})
       .then(function(r){ if(r.ok) poll(); else form.submit(); })

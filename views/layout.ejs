@@ -37,9 +37,11 @@
   <nav class="drawer-nav">
     <% if (user.role === 'freelancer') { %>
       <a href="/f/dashboard"><%- icon('grid') %><%= t('dashboard') %></a>
+      <a href="/f/profile"><%- icon('user') %><%= t('profile') %></a>
       <a href="/f/applications"><%- icon('file') %><%= t('myApplications') %></a>
     <% } else if (user.role === 'company') { %>
       <a href="/c/dashboard"><%- icon('grid') %><%= t('dashboard') %></a>
+      <a href="/c/profile"><%- icon('user') %><%= t('profile') %></a>
       <a href="/c/jobs"><%- icon('file') %><%= t('myJobs') %></a>
       <a href="/c/post"><%- icon('send') %><%= t('postJob') %></a>
     <% } else { %>

@@ -29,6 +29,11 @@ router.get('/dashboard', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+// My public profile
+router.get('/profile', async (req, res, next) => {
+  res.redirect('/companies/' + req.company.id);
+});
+
 // Post a job — step 1: details
 router.get('/post', async (req, res, next) => {
   try {

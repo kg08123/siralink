@@ -200,8 +200,9 @@ table.data th{background:#f1f4f1; font-size:.78rem; text-transform:uppercase; le
 .or-row::before,.or-row::after{content:'';flex:1;height:1px;background:var(--line)}
 .chat-img{max-width:230px;max-height:230px;border-radius:10px;display:block;margin-bottom:6px}
 /* Chat image preview: thumbnail with a small circular X on its top-right corner */
-.img-prev{position:relative;display:inline-block;margin:8px 0}
-.img-prev img{width:96px;height:96px;object-fit:cover;border-radius:12px;border:1px solid var(--line);display:block}
+.img-prev{position:relative;display:inline-block;margin:8px 0 0}
+.img-prev[hidden]{display:none}
+.img-prev img{max-width:200px;max-height:200px;width:auto;height:auto;border-radius:12px;display:block}
 .img-prev-x{position:absolute;top:-8px;right:-8px;width:26px;height:26px;border-radius:50%;border:none;background:#1a1a1a;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .img-prev-x .ico{width:14px;height:14px}
 .img-prev-err{color:var(--red);font-size:.82rem;font-weight:600;margin:4px 0}
