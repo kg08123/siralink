@@ -109,10 +109,16 @@ router.get('/', async (req, res, next) => {
     const { where, params, score } = buildFilters(f);
     const hasQ = (f.q || '').trim().length > 0;
     const orderBy = hasQ ? `(${score}) DESC, ${SORTS[f.sort]}` : SORTS[f.sort];
-    const r = await db.query(`SELECT ${JOB_COLS} ${JOB_FROM} WHERE ${where} ORDER BY ${orderBy} LIMIT 100`, params);
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const PER_PAGE = 8;
+    const totalR = await db.query(`SELECT COUNT(*) AS total ${JOB_FROM} WHERE ${where}`, params);
+    const total = Number(totalR.rows[0].total);
+    const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+    const safePage = Math.min(page, totalPages);
+    const r = await db.query(`SELECT ${JOB_COLS} ${JOB_FROM} WHERE ${where} ORDER BY ${orderBy} LIMIT $${params.length + 1} OFFSET $${params.length + 2}`, [...params, PER_PAGE, (safePage - 1) * PER_PAGE]);
     const jobs = await enrichJobs(r.rows, req.user && req.user.id);
     const cr = await db.query(`SELECT DISTINCT city FROM jobs WHERE published = TRUE AND city IS NOT NULL AND city <> '' ORDER BY city`);
-    res.render('home', { title: res.locals.t('home'), jobs, f, cities: cr.rows.map((x) => x.city) });
+    res.render('home', { title: res.locals.t('home'), jobs, f, cities: cr.rows.map((x) => x.city), total, page: safePage, totalPages });
   } catch (e) { next(e); }
 });
 

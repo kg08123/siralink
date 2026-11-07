@@ -58,7 +58,7 @@ document.getElementById('filterToggle').addEventListener('click', function(){
 });
 </script>
 
-<p class="count"><%= jobs.length %> <%= t('jobsFound') %></p>
+<p class="count"><%= total %> <%= t('jobsFound') %></p>
 
 <% if (!jobs.length) { %>
   <div class="empty"><%= t('noJobs') %></div>
@@ -66,6 +66,13 @@ document.getElementById('filterToggle').addEventListener('click', function(){
 <% jobs.forEach(function(j){ %>
   <%- include('partials/jobcard', { j }) %>
 <% }) %>
+<% if (totalPages > 1) { %>
+  <nav class="pager">
+    <% if (page > 1) { %><a class="btn btn-outline" href="?<%= qs({page: page-1}) %>">← <%= t('prev') %></a><% } %>
+    <span class="pager-info"><%= t('page') %> <%= page %> / <%= totalPages %></span>
+    <% if (page < totalPages) { %><a class="btn btn-outline" href="?<%= qs({page: page+1}) %>"><%= t('next') %> →</a><% } %>
+  </nav>
+<% } %>
 <% if (!user) { %>
   <a class="btn btn-outline" href="/signup" style="margin-top:8px"><%= t('newHere') %> <%= t('createAccount') %></a>
 <% } %>

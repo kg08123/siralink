@@ -2,6 +2,7 @@ const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 const path = require('path');
 const db = require('./db');
 const { t, nt, CATEGORIES, CITIES, catName, cityName } = require('./i18n');
@@ -60,8 +61,9 @@ app.set('layout', 'layout');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(compression());
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { maxAge: '7d' }));
 
 if (googleEnabled && passport) app.use(passport.initialize());
 

@@ -47,7 +47,9 @@ body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans 
 .tag-online{background:#e3f5e9; color:var(--green)}
 .tag-offline{background:#eef0f2; color:#4b5563}
 .budget{margin-left:auto; color:var(--amber); font-weight:800; font-size:1rem}
-.stats-line{display:flex; align-items:center; gap:14px; font-size:.88rem; color:var(--ink); margin:8px 0 12px; flex-wrap:wrap}
+.stats-line{display:flex; align-items:center; gap:14px; font-size:.85rem; color:var(--muted); margin:8px 0 12px; flex-wrap:wrap}
+.pager{display:flex; align-items:center; justify-content:center; gap:12px; margin:18px 0 8px}
+.pager-info{color:var(--muted); font-size:.9rem; font-weight:600}
 .stats-line .stat{min-width:0}
 .stars{color:var(--amber); letter-spacing:1px}
 /* Forms */
