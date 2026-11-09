@@ -365,6 +365,7 @@ const CATEGORIES = [
   ['delivery', 'Delivery & Driving', 'ማድረስ እና ማሽከርከር'],
   ['tutoring', 'Tutoring', 'ትምህርት'],
   ['marketing', 'Marketing', 'ማርኬቲንግ'],
+  ['ugc', 'UGC & Video Ads', 'UGC እና ቪዲዮ ማስታወቂያ'],
   ['cleaning', 'Cleaning', 'ጽዳት'],
   ['other', 'Other', 'ሌላ'],
 ];
